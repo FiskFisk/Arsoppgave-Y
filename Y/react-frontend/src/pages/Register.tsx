@@ -15,10 +15,11 @@ const Register: React.FC = () => {
         email,
         password,
       });
-      alert("User registered successfully!");
+      // Navigate directly to the login page with no alert
       navigate("/login");
     } catch (error) {
-      alert("Registration failed! " + error);
+      // Optionally, you could log errors to console or display inline errors here.
+      console.error("Registration failed", error);
     }
   };
 

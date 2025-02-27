@@ -1,3 +1,7 @@
+import os
+import json
+import time
+import random
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -38,6 +42,30 @@ def register():
     new_user = User(username=data['username'], email=data['email'], password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
+
+    # Update the JSON file with the new user's data
+    json_filename = "social_data.json"
+    if os.path.exists(json_filename):
+        with open(json_filename, "r") as f:
+            try:
+                social_data = json.load(f)
+            except json.JSONDecodeError:
+                social_data = {"users": []}
+    else:
+        social_data = {"users": []}
+
+    new_user_data = {
+        "id": new_user.id,
+        "username": new_user.username,
+        "posts": [],
+        "following": [],
+        "followers": []
+    }
+    social_data["users"].append(new_user_data)
+
+    with open(json_filename, "w") as f:
+        json.dump(social_data, f, indent=4)
+
     return jsonify({"message": "User created successfully"}), 201
 
 # Login endpoint
@@ -56,6 +84,74 @@ def login():
 def protected():
     current_user = get_jwt_identity()
     return jsonify(message=f"You have logged in, {current_user}"), 200
+
+# New Post endpoint: Create a post and update the JSON file
+@app.route('/post', methods=['POST'])
+@jwt_required()
+def create_post():
+    data = request.get_json()
+    message = data.get('message', '')
+    hashtags = data.get('hashtags', [])
+    username = get_jwt_identity()
+
+    json_filename = "social_data.json"
+    if os.path.exists(json_filename):
+        with open(json_filename, "r") as f:
+            try:
+                social_data = json.load(f)
+            except json.JSONDecodeError:
+                return jsonify({"message": "Error reading social data"}), 500
+    else:
+        return jsonify({"message": "Social data file not found"}), 500
+
+    user_found = False
+    for user in social_data.get("users", []):
+        if user.get("username") == username:
+            # Create a new post with a unique id (using current time in milliseconds)
+            post = {
+                "id": int(time.time() * 1000),
+                "message": message,
+                "hashtags": hashtags
+            }
+            # Insert the new post at the beginning so it appears at the top
+            user.setdefault("posts", []).insert(0, post)
+            user_found = True
+            break
+
+    if not user_found:
+        return jsonify({"message": "User not found in social data"}), 404
+
+    with open(json_filename, "w") as f:
+        json.dump(social_data, f, indent=4)
+
+    return jsonify({"message": "Post created successfully"}), 201
+
+# New endpoint: Get up to 10 random posts from the JSON file
+@app.route('/posts', methods=['GET'])
+def get_posts():
+    json_filename = "social_data.json"
+    if os.path.exists(json_filename):
+        with open(json_filename, "r") as f:
+            try:
+                social_data = json.load(f)
+            except json.JSONDecodeError:
+                return jsonify({"posts": []}), 500
+    else:
+        return jsonify({"posts": []}), 404
+
+    all_posts = []
+    # Gather posts from all users, and attach the username to each post
+    for user in social_data.get("users", []):
+        for post in user.get("posts", []):
+            post_with_user = post.copy()
+            post_with_user["username"] = user["username"]
+            all_posts.append(post_with_user)
+
+    # Shuffle and select up to 10 random posts
+    random.shuffle(all_posts)
+    posts_to_return = all_posts[:10]
+
+    return jsonify({"posts": posts_to_return}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
