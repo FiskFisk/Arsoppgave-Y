@@ -9,14 +9,15 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/login", {
+      const response = await axios.post("http://10.2.2.63:5000/login", { // Corrected to /login
         username,
         password,
       });
-      localStorage.setItem("token", response.data.access_token);
+      localStorage.setItem("token", response.data.access_token); // Correct access token key
       alert("Login successful!");
       navigate("/protected");
     } catch (error) {
+      console.error("Login error:", error); // Log error for debugging
       alert("Invalid credentials");
     }
   };
@@ -40,7 +41,7 @@ const Login: React.FC = () => {
       <p>
         Don't have an account?{" "}
         <span
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/")} // Navigate to the register page
           style={{ cursor: "pointer", color: "blue" }}
         >
           Register

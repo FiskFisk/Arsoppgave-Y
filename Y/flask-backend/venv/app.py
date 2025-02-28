@@ -154,4 +154,4 @@ def get_posts():
     return jsonify({"posts": posts_to_return}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)  # Update host to 0.0.0.0 for network access

@@ -10,16 +10,15 @@ const Register: React.FC = () => {
 
   const handleRegister = async () => {
     try {
-      await axios.post("http://localhost:5000/register", {
+      await axios.post("http://10.2.2.63:5000/register", { // Replace <your-ip> with your actual IP or localhost
         username,
         email,
         password,
       });
-      // Navigate directly to the login page with no alert
-      navigate("/login");
+      navigate("/login"); // Navigate to login page on successful registration
     } catch (error) {
-      // Optionally, you could log errors to console or display inline errors here.
-      console.error("Registration failed", error);
+      console.error("Registration failed", error); // Log error for debugging
+      alert("Registration failed. Please try again."); // Optionally alert the user
     }
   };
 
@@ -48,7 +47,7 @@ const Register: React.FC = () => {
       <p>
         Already have an account?{" "}
         <span
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/login")} // Navigate to the login page
           style={{ cursor: "pointer", color: "blue" }}
         >
           Login

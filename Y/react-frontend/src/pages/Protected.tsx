@@ -8,26 +8,40 @@ interface Post {
   username?: string;
 }
 
-const Project: React.FC = () => {
+const Protected: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [postText, setPostText] = useState<string>("");
   const [hashtagInput, setHashtagInput] = useState<string>("");
   const [hashtags, setHashtags] = useState<string[]>([]);
+  const [username, setUsername] = useState<string | null>(null);
 
-  // Fetch posts when the component mounts
+  // Fetch posts and username when the component mounts
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/posts");
-        setPosts(response.data.posts);
+        const response = await axios.get("http://10.2.2.63:5000/protected", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setUsername(response.data.message.split(", ")[1]); // Extract the username
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        console.error("Error fetching username:", error);
       }
     };
 
     fetchPosts();
   }, []);
+
+  const fetchAllPosts = async () => {
+    try {
+      const response = await axios.get("http://10.2.2.63:5000/posts"); // Use the correct endpoint
+      setPosts(response.data.posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
   // Open the modal popup
   const openModal = () => {
@@ -64,124 +78,130 @@ const Project: React.FC = () => {
       const token = localStorage.getItem("token");
       // API call to create a post
       await axios.post(
-        "http://localhost:5000/post",
+        "http://10.2.2.63:5000/post", // Use your network IP
         { message: postText, hashtags: hashtags },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // Refresh posts after posting
-      const response = await axios.get("http://localhost:5000/posts");
-      setPosts(response.data.posts);
+      fetchAllPosts();
       closeModal();
     } catch (error) {
       console.error("Error posting:", error);
     }
   };
 
+  // Fetch all posts on component mount
+  useEffect(() => {
+    fetchAllPosts();
+  }, []);
+
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Hello</h1>
-      <button onClick={openModal}>Post Something</button>
+      <h1 style={{ color: "white" }}>Hello, {username}!</h1>
+      <button onClick={openModal}>Create Post</button>
 
-      {/* Modal Popup */}
+      {/* Posts List */}
+      <div>
+        {posts.map((post) => (
+          <div key={post.id}>
+            <h3>{post.username}:</h3>
+            <p>{post.message}</p>
+            <p>{post.hashtags.join(" ")}</p>
+            <hr />
+          </div>
+        ))}
+      </div>
+
+      {/* Modal for creating a new post */}
       {isModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              width: "400px",
-            }}
-          >
-            <h2>Create Post</h2>
+        <div className="modal" style={modalStyles}>
+          <h2 style={{ color: "white", textAlign: "center" }}>Create a Post</h2>
+          <div style={inputContainerStyles}>
             <textarea
-              placeholder="Write your post..."
               value={postText}
               onChange={(e) => setPostText(e.target.value)}
-              style={{ width: "100%", height: "100px", marginBottom: "10px" }}
-            />
+              placeholder="Write your post..."
+              style={inputStyles}
+            ></textarea>
             <input
               type="text"
-              placeholder="Enter hashtags (press space to add)"
               value={hashtagInput}
-              onChange={(e) => setHashtagInput(e.target.value)}
               onKeyDown={handleHashtagKeyDown}
-              style={{ width: "100%", marginBottom: "10px" }}
+              onChange={(e) => setHashtagInput(e.target.value)}
+              placeholder="Add hashtags..."
+              style={inputStyles}
             />
-            {/* Display hashtags as blue tags */}
-            <div style={{ marginBottom: "10px" }}>
-              {hashtags.map((tag, index) => (
-                <span
-                  key={index}
-                  style={{
-                    backgroundColor: "lightblue",
-                    padding: "5px",
-                    marginRight: "5px",
-                    borderRadius: "5px",
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <button onClick={handlePost}>Post</button>
-              <button onClick={closeModal}>Exit</button>
-            </div>
+          </div>
+          <div style={hashtagContainerStyles}>
+            {hashtags.map((tag, index) => (
+              <span key={index} style={hashtagStyles}>
+                {tag}
+              </span>
+            ))}
+          </div>
+          <div style={buttonContainerStyles}>
+            <button onClick={handlePost}>Submit</button>
+            <button onClick={closeModal}>Cancel</button>
           </div>
         </div>
       )}
-
-      {/* Posts Display */}
-      <div style={{ marginTop: "20px" }}>
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <div
-              key={post.id}
-              style={{
-                border: "1px solid #ccc",
-                padding: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <p>
-                <strong>{post.username}</strong>: {post.message}
-              </p>
-              <div>
-                {post.hashtags.map((tag, index) => (
-                  <span
-                    key={index}
-                    style={{
-                      backgroundColor: "lightblue",
-                      padding: "3px 6px",
-                      marginRight: "5px",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No posts yet.</p>
-        )}
-      </div>
     </div>
   );
 };
 
-export default Project;
+// Styles for the modal
+const modalStyles: React.CSSProperties = {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  backgroundColor: "#1a1a1a", // Very dark gray
+  padding: "20px",
+  border: "1px solid #ccc",
+  zIndex: 1000,
+  width: "400px", // Set width of the modal
+};
+
+// Styles for the input fields and container
+const inputContainerStyles: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  marginBottom: "10px",
+};
+
+const inputStyles: React.CSSProperties = {
+  width: "90%", // Set width of the input boxes
+  height: "40px",
+  backgroundColor: "#333", // Darker gray for input boxes
+  color: "white",
+  border: "1px solid #444",
+  padding: "8px",
+  marginBottom: "10px",
+};
+
+// Styles for the hashtag boxes
+const hashtagContainerStyles: React.CSSProperties = {
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "center",
+  marginBottom: "10px",
+};
+
+const hashtagStyles: React.CSSProperties = {
+  margin: "5px",
+  backgroundColor: "blue", // Blue background for hashtags
+  color: "white",
+  padding: "5px",
+  borderRadius: "3px",
+  display: "inline-block",
+};
+
+// Styles for the buttons container
+const buttonContainerStyles: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-around",
+  width: "100%",
+};
+
+export default Protected;
