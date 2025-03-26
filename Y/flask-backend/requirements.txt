@@ -1,0 +1,4 @@
+Requirement already satisfied: flask in c:\users\julian\onedrive - osloskolen\vg 2\it\årsoppgave\arsoppgave-y\y\flask-backend\venv\lib\site-packages (3.1.0)
+Requirement already satisfied: flask_sqlalchemy in c:\users\julian\onedrive - osloskolen\vg 2\it\årsoppgave\arsoppgave-y\y\flask-backend\venv\lib\site-packages (3.1.1)
+Requirement already satisfied: flask_bcrypt in c:\users\julian\onedrive - osloskolen\vg 2\it\årsoppgave\arsoppgave-y\y\flask-backend\venv\lib\site-packages (1.0.1)
+Requirement already satisfied: flask_jwt_extended in c:\users\julian\onedrive - osloskolen\vg 2\it\årsoppgave\arsoppgave-y\y\flask-backend\venv\lib\site-packages (4.7.1)
