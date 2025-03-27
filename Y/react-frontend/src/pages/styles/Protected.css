@@ -1,0 +1,163 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    background-color: #2c2c2c;
+    width: 200px;
+    height: 100vh;
+    padding: 20px;
+    color: white;
+    position: fixed;
+    left: 0;
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.closed {
+    transform: translateX(-100%);
+  }
+  
+  /* Sidebar Toggle Button */
+  .sidebar-toggle {
+    position: fixed;
+    top: 5px;
+    left: 240px; /* Move the button more to the left */
+    width: 40px;
+    height: 40px;
+    background-color: #444;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    line-height: 40px; /* Set line-height to match height */
+  }
+  
+  
+  /* When sidebar is closed, move the button to the left */
+  .sidebar.closed + .sidebar-toggle {
+    left: 10px;
+  }
+  
+  .sidebar-toggle:hover {
+    background-color: #666;
+  }
+  
+  /* Sidebar Buttons */
+  .sidebar button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+  }
+  
+  .sidebar button:hover {
+    background-color: #444;
+  }
+  
+  /* Content */
+  .content {
+    flex: 1;
+    padding: 20px;
+    background-color: #1a1a1a;
+    color: white;
+    margin-left: 200px; /* Ensures content is beside the sidebar */
+    transition: margin-left 0.3s ease;
+  }
+  
+  .sidebar.closed + .content {
+    margin-left: 0;
+  }
+  
+  .full-width {
+    margin-left: 0;
+  }
+  
+  /* Post Button */
+  .post-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: auto;
+  }
+  
+  .post-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Post Feed */
+  .post-feed {
+    margin-top: 20px;
+  }
+  
+  /* Posts */
+  .post {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .hashtags {
+    color: #00bfff; /* Light blue for hashtags */
+  }
+  
+  /* Modal */
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    width: 400px;
+  }
+  
+  /* Inputs */
+  textarea, input {
+    width: 100%;
+    background-color: #444;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+  }
+  
+  /* Hashtag Container */
+  .hashtag-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  
+  .hashtag {
+    background-color: #00bfff;
+    color: white;
+    padding: 5px;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+  
