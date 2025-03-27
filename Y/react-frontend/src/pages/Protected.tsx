@@ -20,7 +20,7 @@ const Protected: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchUsername = async () => {
       try {
         const response = await axios.get("http://10.2.2.63:5000/protected", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -31,7 +31,7 @@ const Protected: React.FC = () => {
       }
     };
 
-    fetchPosts();
+    fetchUsername();
   }, []);
 
   const fetchAllPosts = async () => {
@@ -65,11 +65,20 @@ const Protected: React.FC = () => {
       return;
     }
 
+    const token = localStorage.getItem("token");
+    console.log("Token:", token); // Log the token
+
     try {
-      const response = await axios.post("http://10.2.2.63:5000/post", { // Changed to /post
-        message: postText,
-        hashtags: hashtags,
-      });
+      const response = await axios.post(
+        "http://10.2.2.63:5000/post",
+        {
+          message: postText,
+          hashtags: hashtags,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.status === 201) {
         alert("Post created successfully!");
@@ -80,7 +89,7 @@ const Protected: React.FC = () => {
       }
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("An error occurred while posting.");
+      alert("An error occurred while posting. Status: " + error.response.status);
     }
   };
 
@@ -110,7 +119,9 @@ const Protected: React.FC = () => {
       {/* Content */}
       <div className={`content ${isSidebarOpen ? "" : "full-width"}`}>
         <h1>Hello, {username}!</h1>
-        <button className="post-button" onClick={openModal}>Create Post</button>
+        <button className="post-button" onClick={openModal}>
+          Create Post
+        </button>
         <div className="post-feed">
           {posts.map((post) => (
             <div key={post.id} className="post">
@@ -139,7 +150,10 @@ const Protected: React.FC = () => {
                 e.preventDefault();
                 const trimmed = hashtagInput.trim();
                 if (trimmed.length > 0) {
-                  setHashtags([...hashtags, trimmed.startsWith("#") ? trimmed : `#${trimmed}`]);
+                  setHashtags([
+                    ...hashtags,
+                    trimmed.startsWith("#") ? trimmed : `#${trimmed}`,
+                  ]);
                   setHashtagInput("");
                 }
               }
@@ -149,7 +163,9 @@ const Protected: React.FC = () => {
           />
           <div className="hashtag-container">
             {hashtags.map((tag, index) => (
-              <span key={index} className="hashtag">{tag}</span>
+              <span key={index} className="hashtag">
+                {tag}
+              </span>
             ))}
           </div>
           <button onClick={handlePost}>Submit</button>

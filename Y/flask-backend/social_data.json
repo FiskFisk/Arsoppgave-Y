@@ -3,7 +3,15 @@
         {
             "id": 1,
             "username": "Julian",
-            "posts": [],
+            "posts": [
+                {
+                    "id": 1743072873764,
+                    "message": "post",
+                    "hashtags": [
+                        "#hashtag"
+                    ]
+                }
+            ],
             "following": [],
             "followers": []
         }
