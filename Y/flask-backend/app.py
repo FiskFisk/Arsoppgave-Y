@@ -1,7 +1,7 @@
 import os
 import json
 import time
-import random
+import re
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -94,6 +94,10 @@ def create_post():
     hashtags = data.get('hashtags', [])
     username = get_jwt_identity()
 
+    # Validate input: Allow all characters except for backslash
+    if not re.match(r'^[^\\]*$', message):  # Updated regex to disallow backslash
+        return jsonify({"message": "Post contains invalid characters. All characters are allowed except the backslash."}), 400
+
     json_filename = "social_data.json"
     if os.path.exists(json_filename):
         with open(json_filename, "r") as f:
@@ -109,9 +113,10 @@ def create_post():
         if user.get("username") == username:
             # Create a new post with a unique id (using current time in milliseconds)
             post = {
-                "id": int(time.time() * 1000),
+                "id": int(time.time() * 1000),  # Timestamp as post ID for ordering
                 "message": message,
-                "hashtags": hashtags
+                "hashtags": hashtags,
+                "timestamp": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())  # Add timestamp
             }
             # Insert the new post at the beginning so it appears at the top
             user.setdefault("posts", []).insert(0, post)
@@ -126,7 +131,8 @@ def create_post():
 
     return jsonify({"message": "Post created successfully"}), 201
 
-# New endpoint: Get up to 10 random posts from the JSON file
+
+# New endpoint: Get up to 30 posts from the JSON file (ordered by timestamp)
 @app.route('/posts', methods=['GET'])
 def get_posts():
     json_filename = "social_data.json"
@@ -147,9 +153,11 @@ def get_posts():
             post_with_user["username"] = user["username"]
             all_posts.append(post_with_user)
 
-    # Shuffle and select up to 10 random posts
-    random.shuffle(all_posts)
-    posts_to_return = all_posts[:10]
+    # Sort all posts by timestamp (newest first)
+    all_posts.sort(key=lambda x: x["id"], reverse=True)
+
+    # Limit the result to a maximum of 30 posts
+    posts_to_return = all_posts[:30]
 
     return jsonify({"posts": posts_to_return}), 200
 

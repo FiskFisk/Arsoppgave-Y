@@ -142,10 +142,31 @@ const handleRegister = async () => {
 - 📰 The **main content area** includes the post input field and a feed displaying posts with usernames.
 - 📎 On the **right side**, an additional content section is available.
 
+### 5️⃣ Profile Functionality
+When users click the profile button, they are directed to their own profile page, where they can see all the posts they have made. This is achieved by retrieving the username and accessing the JSON file to display every post associated with that username.
+
+## 🌐 Dual Server Architecture
+The application runs on two separate servers: one for the frontend and one for the backend. This approach offers several benefits:
+- **Separation of Concerns**: Keeping the frontend and backend separate allows for easier maintenance and scalability.
+- **Enhanced Security**: Each server can have different security measures tailored to its specific needs, reducing the attack surface.
+- **Better Performance**: Frontend and backend can be optimized independently, improving overall application performance.
+
+## 🔄 Application Execution
+The following code snippet illustrates why using `if __name__ == '__main__':` is a good practice:
+```python
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)  # Update host to 0.0.0.0 for network access
+```
+### Benefits of This Approach:
+- **Controlled Execution**: This block ensures the Flask app runs only when the script is executed directly, preventing unwanted execution when imported.
+- **Network Accessibility**: Setting `host='0.0.0.0'` allows the app to be accessed from any device on the local network, making it easier for testing and collaboration.
+- **Development Convenience**: With `debug=True`, it provides useful debugging information and auto-reloads the server when code changes are made.
+
 ## 🔮 Future Enhancements
 - 🔔 Add functionality for notifications, profiles, and settings.
 - 🔐 Implement user authentication improvements.
 - 🎨 Enhance the design with animations and styling refinements.
+- 👨‍💼 Implement an Admin account to track statistics such as daily posts and total account counts.
 
 ## 🎯 Conclusion
 Y is a simplified X/Twitter-like social media platform with a structured authentication system, post storage, and a familiar user interface. The project is open for future development and improvements to enhance user experience and functionality. 🚀

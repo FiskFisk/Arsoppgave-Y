@@ -1,4 +1,11 @@
+# Ignore virtual environment folder
 venv/
+
+# Ignore Python cache files
 __pycache__/
 *.pyc
 *.pyo
+
+# Ignore database and social data files
+users.db
+social_data.json

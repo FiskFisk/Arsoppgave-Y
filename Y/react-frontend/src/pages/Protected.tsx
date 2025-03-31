@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "./styles/Protected.css"; // Import the CSS file
 
 interface Post {
@@ -20,6 +21,9 @@ const Protected: React.FC = () => {
   const POST_CHAR_LIMIT = 200;
   const HASHTAG_CHAR_LIMIT = 30;
   const MAX_HASHTAGS = 5; // Maximum number of hashtags allowed
+  const MAX_WORD_LENGTH = 50; // Maximum length of a word in the post (modifiable)
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -55,13 +59,31 @@ const Protected: React.FC = () => {
       return;
     }
 
+    // Remove unwanted Unicode characters from post text
+    const sanitizedPostText = postText.replace(/\\u[0-9a-fA-F]{4}/g, ''); // Remove Unicode sequences
+
+    // Check for long words (more than MAX_WORD_LENGTH characters)
+    const words = sanitizedPostText.split(" ");
+    const longWord = words.find(word => word.length > MAX_WORD_LENGTH);
+    if (longWord) {
+      alert(`Error: One of the words is too long (maximum ${MAX_WORD_LENGTH} characters).`);
+      return;
+    }
+
+    // Validate input: Allow all characters except for backslash
+    const isValidPost = /^[^\\]*$/.test(sanitizedPostText); // Updated regex to disallow backslash
+    if (!isValidPost) {
+      alert("Post contains invalid characters. All characters are allowed except the backslash.");
+      return;
+    }
+
     const token = localStorage.getItem("token");
 
     try {
       const response = await axios.post(
         "http://10.2.2.63:5000/post",
         {
-          message: postText,
+          message: sanitizedPostText, // Use sanitized text
           hashtags: hashtags,
         },
         {
@@ -80,7 +102,7 @@ const Protected: React.FC = () => {
       }
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("An error occurred while posting. Status: " + error.response.status);
+      alert("An error occurred while posting. Status: " + (error as any).response?.status); // Type assertion here
     }
   };
 
@@ -115,13 +137,17 @@ const Protected: React.FC = () => {
     document.addEventListener("mouseup", onMouseUp);
   };
 
+  const handleProfileClick = () => {
+    navigate("/profile"); // Navigate to the profile page
+  };
+
   return (
     <div className="container">
       <div className="sidebar">
         <div className="logo"></div>
         <button>Home</button>
         <button>Notifications</button>
-        <button>Profile</button>
+        <button onClick={handleProfileClick}>Profile</button> {/* Profile button */}
         <button>Settings</button>
       </div>
 

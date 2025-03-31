@@ -23,6 +23,12 @@ const Register: React.FC = () => {
     }
   };
 
+  // Function to validate username
+  const isUsernameValid = (username: string) => {
+    const regex = /^[A-Za-z0-9]+$/; // Allows only letters and numbers
+    return regex.test(username);
+  };
+
   return (
     <div className="register-container">
       <div className="logo"></div> {/* Placeholder for the logo */}
@@ -30,6 +36,7 @@ const Register: React.FC = () => {
       <input
         type="text"
         placeholder="Username"
+        maxLength={16} // Set maximum length to 16 characters
         onChange={(e) => setUsername(e.target.value)}
       />
       <input
@@ -42,7 +49,12 @@ const Register: React.FC = () => {
         placeholder="Password"
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={handleRegister}>Register</button>
+      <button
+        onClick={handleRegister}
+        disabled={!isUsernameValid(username) || username.length === 0} // Disable button if username is invalid or empty
+      >
+        Register
+      </button>
       <p>
         Already have an account?{" "}
         <span onClick={() => navigate("/login")}>Login</span>
