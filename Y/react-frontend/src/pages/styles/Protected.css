@@ -109,6 +109,12 @@ html {
   background-color: #0056b3;
 }
 
+/* Error Message */
+.error-message {
+  color: red; /* Red color for error messages */
+  margin-top: 5px;
+}
+
 /* Divider */
 .divider {
   width: 5px; /* Width of the divider */
@@ -163,4 +169,13 @@ html {
   color: #007bff;
   max-width: 600px;
   word-wrap: break-word;
+}
+
+/* Character Count Styling */
+.char-count {
+  color: rgb(255, 255, 255) !important;
+}
+
+.char-count.red {
+  color: red; /* Red color for character count when limit is exceeded */
 }

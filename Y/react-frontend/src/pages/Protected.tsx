@@ -17,6 +17,7 @@ const Protected: React.FC = () => {
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [username, setUsername] = useState<string | null>(null);
   const [contentWidth, setContentWidth] = useState<number>(600); // Initial width for the content area
+  const [errorMessage, setErrorMessage] = useState<string>(""); // State for error messages
 
   const POST_CHAR_LIMIT = 200;
   const HASHTAG_CHAR_LIMIT = 30;
@@ -55,7 +56,7 @@ const Protected: React.FC = () => {
 
   const handlePost = async () => {
     if (!postText.trim()) {
-      alert("Post cannot be empty!");
+      setErrorMessage("Post cannot be empty!");
       return;
     }
 
@@ -66,14 +67,14 @@ const Protected: React.FC = () => {
     const words = sanitizedPostText.split(" ");
     const longWord = words.find(word => word.length > MAX_WORD_LENGTH);
     if (longWord) {
-      alert(`Error: One of the words is too long (maximum ${MAX_WORD_LENGTH} characters).`);
+      setErrorMessage(`Error: One of the words is too long (maximum ${MAX_WORD_LENGTH} characters).`);
       return;
     }
 
     // Validate input: Allow all characters except for backslash
     const isValidPost = /^[^\\]*$/.test(sanitizedPostText); // Updated regex to disallow backslash
     if (!isValidPost) {
-      alert("Post contains invalid characters. All characters are allowed except the backslash.");
+      setErrorMessage("Post contains invalid characters. All characters are allowed except the backslash.");
       return;
     }
 
@@ -92,17 +93,17 @@ const Protected: React.FC = () => {
       );
 
       if (response.status === 201) {
-        alert("Post created successfully!");
+        setErrorMessage(""); // Clear error message
         fetchAllPosts();
         setPostText("");
         setHashtags([]);
         setHashtagInput("");
       } else {
-        alert("Failed to create post.");
+        setErrorMessage("Failed to create post.");
       }
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("An error occurred while posting. Status: " + (error as any).response?.status); // Type assertion here
+      setErrorMessage("An error occurred while posting."); // Show error message
     }
   };
 
@@ -159,13 +160,15 @@ const Protected: React.FC = () => {
           <textarea
             value={postText}
             onChange={(e) =>
-              e.target.value.length <= POST_CHAR_LIMIT &&
+              e.target.value.length <= POST_CHAR_LIMIT + 50 && // Allow more than 200 characters
               setPostText(e.target.value)
             }
             placeholder="What's happening?"
             className="post-textarea"
           ></textarea>
-          <p className="char-count">{postText.length}/{POST_CHAR_LIMIT}</p>
+          <p className="char-count" style={{ color: postText.length > POST_CHAR_LIMIT ? 'red' : 'black' }}>
+            {postText.length}/{POST_CHAR_LIMIT}
+          </p>
 
           <input
             type="text"
@@ -196,6 +199,10 @@ const Protected: React.FC = () => {
               <p>Current Hashtags: {hashtags.join(" ")}</p>
             )}
           </div>
+
+          {/* Error message display */}
+          {errorMessage && <p className="error-message" style={{ color: 'red' }}>{errorMessage}</p>}
+
           <button className="post-button" onClick={handlePost}>
             Post
           </button>
