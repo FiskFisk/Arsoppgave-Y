@@ -19,8 +19,8 @@ const Protected: React.FC = () => {
   const [contentWidth, setContentWidth] = useState<number>(600); // Initial width for the content area
   const [errorMessage, setErrorMessage] = useState<string>(""); // State for error messages
 
-  const POST_CHAR_LIMIT = 200;
-  const HASHTAG_CHAR_LIMIT = 30;
+  const POST_CHAR_LIMIT = 200; // Character limit for posts
+  const HASHTAG_CHAR_LIMIT = 30; // Character limit for hashtags
   const MAX_HASHTAGS = 5; // Maximum number of hashtags allowed
   const MAX_WORD_LENGTH = 50; // Maximum length of a word in the post (modifiable)
 
@@ -78,6 +78,12 @@ const Protected: React.FC = () => {
       return;
     }
 
+    // Check character limit
+    if (sanitizedPostText.length > POST_CHAR_LIMIT) {
+      setErrorMessage(`Post exceeds the character limit of ${POST_CHAR_LIMIT}.`);
+      return;
+    }
+
     const token = localStorage.getItem("token");
 
     try {
@@ -109,12 +115,35 @@ const Protected: React.FC = () => {
 
   const addHashtag = () => {
     const trimmed = hashtagInput.trim();
+
+    // Check for backslash in the hashtag input
+    const isValidHashtag = /^[^\\]*$/.test(trimmed); // Disallow backslashes
+    if (!isValidHashtag) {
+      setErrorMessage("Hashtag contains invalid characters. All characters are allowed except the backslash.");
+      return;
+    }
+
+    // Check for invalid characters in the hashtag (allow only alphanumeric and #)
+    const isValidHashtagCharacters = /^[a-zA-Z0-9#]+$/.test(trimmed);
+    if (!isValidHashtagCharacters) {
+      setErrorMessage("Hashtag can only contain letters, numbers, and the '#' character.");
+      return;
+    }
+
+    // Check character limit for hashtags
+    if (trimmed.length > HASHTAG_CHAR_LIMIT) {
+      setErrorMessage(`Hashtag exceeds the character limit of ${HASHTAG_CHAR_LIMIT}.`);
+      return;
+    }
+
+    // Add the hashtag if it is valid and within the maximum limit
     if (trimmed.length > 0 && hashtags.length < MAX_HASHTAGS) {
       setHashtags((prev) => [
         ...prev,
         trimmed.startsWith("#") ? trimmed : `#${trimmed}`,
       ]);
       setHashtagInput("");
+      setErrorMessage(""); // Clear error message on successful addition
     }
   };
 
@@ -142,12 +171,16 @@ const Protected: React.FC = () => {
     navigate("/profile"); // Navigate to the profile page
   };
 
+  const handleNotificationsClick = () => {
+    navigate("/notfic"); // Navigate to the notifications page
+  };
+
   return (
     <div className="container">
       <div className="sidebar">
         <div className="logo"></div>
         <button>Home</button>
-        <button>Notifications</button>
+        <button onClick={handleNotificationsClick}>Notifications</button> {/* Notifications button */}
         <button onClick={handleProfileClick}>Profile</button> {/* Profile button */}
         <button>Settings</button>
       </div>
@@ -166,7 +199,7 @@ const Protected: React.FC = () => {
             placeholder="What's happening?"
             className="post-textarea"
           ></textarea>
-          <p className="char-count" style={{ color: postText.length > POST_CHAR_LIMIT ? 'red' : 'black' }}>
+          <p className={`char-count ${postText.length > POST_CHAR_LIMIT ? 'red' : 'default'}`}>
             {postText.length}/{POST_CHAR_LIMIT}
           </p>
 

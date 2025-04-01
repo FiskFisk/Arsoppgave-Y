@@ -31,6 +31,27 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+# Function to remove invalid posts
+def remove_invalid_posts():
+    json_filename = "social_data.json"
+    if not os.path.exists(json_filename):
+        return
+
+    with open(json_filename, "r") as f:
+        try:
+            social_data = json.load(f)
+        except json.JSONDecodeError:
+            return
+
+    for user in social_data.get("users", []):
+        if "posts" in user and user["posts"]:
+            latest_post = user["posts"][0]  # Get the newest post
+            if re.search(r'\\', latest_post["message"]):  # Check if message contains backslash
+                user["posts"].pop(0)  # Remove the latest post
+                
+    with open(json_filename, "w") as f:
+        json.dump(social_data, f, indent=4)
+
 # Registration endpoint
 @app.route('/register', methods=['POST'])
 def register():
@@ -43,7 +64,6 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    # Update the JSON file with the new user's data
     json_filename = "social_data.json"
     if os.path.exists(json_filename):
         with open(json_filename, "r") as f:
@@ -78,14 +98,14 @@ def login():
         return jsonify(access_token=access_token), 200
     return jsonify({"message": "Invalid username or password"}), 401
 
-# Protected endpoint (only accessible with valid JWT)
+# Protected endpoint
 @app.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
     current_user = get_jwt_identity()
     return jsonify(message=f"You have logged in, {current_user}"), 200
 
-# New Post endpoint: Create a post and update the JSON file
+# Create Post endpoint
 @app.route('/post', methods=['POST'])
 @jwt_required()
 def create_post():
@@ -93,10 +113,6 @@ def create_post():
     message = data.get('message', '')
     hashtags = data.get('hashtags', [])
     username = get_jwt_identity()
-
-    # Validate input: Allow all characters except for backslash
-    if not re.match(r'^[^\\]*$', message):  # Updated regex to disallow backslash
-        return jsonify({"message": "Post contains invalid characters. All characters are allowed except the backslash."}), 400
 
     json_filename = "social_data.json"
     if os.path.exists(json_filename):
@@ -109,19 +125,31 @@ def create_post():
         return jsonify({"message": "Social data file not found"}), 500
 
     user_found = False
+    notification_message = None  # Initialize notification message
+
     for user in social_data.get("users", []):
         if user.get("username") == username:
-            # Create a new post with a unique id (using current time in milliseconds)
+            # Check for backslash or other unwanted characters in the message
+            if '\\' in message or any(ord(c) < 32 or ord(c) > 126 for c in message):  # Example check for control characters
+                notification_message = "Your post was removed due to the presence of invalid characters."
+                continue  # Skip adding this post
             post = {
-                "id": int(time.time() * 1000),  # Timestamp as post ID for ordering
+                "id": int(time.time() * 1000),
                 "message": message,
                 "hashtags": hashtags,
-                "timestamp": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())  # Add timestamp
+                "timestamp": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             }
-            # Insert the new post at the beginning so it appears at the top
             user.setdefault("posts", []).insert(0, post)
             user_found = True
             break
+
+    if notification_message:
+        # Add notification to the user's notifications list
+        user["notifications"] = user.get("notifications", [])
+        user["notifications"].append({
+            "message": notification_message,
+            "timestamp": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        })
 
     if not user_found:
         return jsonify({"message": "User not found in social data"}), 404
@@ -129,10 +157,11 @@ def create_post():
     with open(json_filename, "w") as f:
         json.dump(social_data, f, indent=4)
 
+    remove_invalid_posts()  # Check and remove invalid posts
     return jsonify({"message": "Post created successfully"}), 201
 
 
-# New endpoint: Get up to 30 posts from the JSON file (ordered by timestamp)
+# Get posts endpoint
 @app.route('/posts', methods=['GET'])
 def get_posts():
     json_filename = "social_data.json"
@@ -146,20 +175,16 @@ def get_posts():
         return jsonify({"posts": []}), 404
 
     all_posts = []
-    # Gather posts from all users, and attach the username to each post
     for user in social_data.get("users", []):
         for post in user.get("posts", []):
             post_with_user = post.copy()
             post_with_user["username"] = user["username"]
             all_posts.append(post_with_user)
 
-    # Sort all posts by timestamp (newest first)
     all_posts.sort(key=lambda x: x["id"], reverse=True)
-
-    # Limit the result to a maximum of 30 posts
     posts_to_return = all_posts[:30]
 
     return jsonify({"posts": posts_to_return}), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)  # Update host to 0.0.0.0 for network access
+    app.run(host='0.0.0.0', port=5000, debug=True)
