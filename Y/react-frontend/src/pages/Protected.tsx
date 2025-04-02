@@ -158,7 +158,7 @@ const Protected: React.FC = () => {
         <button className="post-button" onClick={handlePost}>Post</button>
       </div>
 
-      <div className="post-feed">
+      <div className="post-feed" style={{ width: "100%" }}>
         {posts.map((post) => (
           <div key={post.id} className="post">
             <h3>{post.username}:</h3>
