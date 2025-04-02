@@ -2,9 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import Protected from "./pages/Protected";
-import Profile from "./pages/Profile"; // Import the Profile component
-import Notfic from "./pages/Notfic"; // Import the Notfic component
+import Notfic from "./pages/Notfic";
+import MainLayout from "./layouts/MainLayout"; // Use MainLayout for protected routes
 
 const App: React.FC = () => {
   return (
@@ -12,9 +11,8 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/protected" element={<Protected />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/notfic" element={<Notfic />} /> {/* New route for Notifications */}
+        <Route path="/*" element={<MainLayout />} /> {/* Main layout handles protected routes */}
+        <Route path="/notfic" element={<Notfic />} />
       </Routes>
     </Router>
   );

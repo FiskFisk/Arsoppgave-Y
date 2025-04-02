@@ -1,0 +1,44 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000; /* Dark background */
+  color: white;
+  overflow: hidden; /* Disable scrolling on the entire page */
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.content-area {
+  flex: 1;
+  padding: 20px;
+  background-color: #0a0a0a; /* Slightly lighter background for content areas */
+  height: calc(100% - 50px); /* Adjust height to allow for top padding */
+  overflow-y: auto; /* Allow vertical scrolling in the content area */
+  width: 500px
+}
+
+/* Hide scrollbar for content area */
+.content-area::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+}
+
+.content-area {
+  -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+/* Divider styles */
+.divider {
+  width: 5px; /* Width of the divider */
+  background-color: gray; /* Color of the divider */
+  cursor: ew-resize; /* Cursor style when hovering over the divider */
+  height: 100%; /* Set the height to cover the full height */
+  position: relative; /* Keep it relative to the content area */
+  margin-left: -5px; /* Adjust to position directly next to the content area */
+}
