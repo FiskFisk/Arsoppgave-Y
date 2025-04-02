@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "./styles/Notfic.css"; // Import the CSS file
 
 interface Notification {
@@ -22,7 +22,7 @@ const Notfic: React.FC = () => {
         const username = response.data.message.split(", ")[1];
 
         // Fetch the user data to get notifications
-        const userResponse = await axios.get("http://10.2.2.63:5000/users"); // Assume you have an endpoint to get user data
+        const userResponse = await axios.get("http://10.2.2.63:5000/users");
         const user = userResponse.data.users.find((user: any) => user.username === username);
         setNotifications(user.notifications || []); // Set notifications if they exist
       } catch (error) {
@@ -33,14 +33,9 @@ const Notfic: React.FC = () => {
     fetchNotifications();
   }, []);
 
-  const handleBack = () => {
-    navigate("/protected"); // Navigate back to the protected page
-  };
-
   return (
     <div className="notfic-container">
       <h1>Notifications</h1>
-      <button onClick={handleBack}>Back</button>
       <div className="notifications">
         {notifications.length > 0 ? (
           notifications.map((notification, index) => (

@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar.tsx";
 import AdditionalContent from "./components/AdditionalContent.tsx";
 import Protected from "../pages/Protected.tsx";
 import Profile from "../pages/Profile.tsx";
+import Notfic from "../pages/Notfic.tsx"; // Import Notfic
 import "./styles/MainLayout.css";
 
 const MainLayout: React.FC = () => {
@@ -61,6 +62,7 @@ const MainLayout: React.FC = () => {
         <Routes>
           <Route path="/protected" element={<Protected />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/notfic" element={<Notfic />} /> {/* Add Notfic route */}
         </Routes>
       </div>
 
