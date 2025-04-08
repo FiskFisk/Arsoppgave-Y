@@ -22,8 +22,6 @@ const Protected: React.FC = () => {
   const HASHTAG_CHAR_LIMIT = 30;
   const MAX_HASHTAGS = 5;
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     const fetchUsername = async () => {
       try {
@@ -58,14 +56,7 @@ const Protected: React.FC = () => {
       return;
     }
 
-    const sanitizedPostText = postText.replace(/\\u[0-9a-fA-F]{4}/g, '');
-    const isValidPost = /^[^\\]*$/.test(sanitizedPostText);
-    if (!isValidPost) {
-      setErrorMessage("Post contains invalid characters. All characters are allowed except the backslash.");
-      return;
-    }
-
-    if (sanitizedPostText.length > POST_CHAR_LIMIT) {
+    if (postText.length > POST_CHAR_LIMIT) {
       setErrorMessage(`Post exceeds the character limit of ${POST_CHAR_LIMIT}.`);
       return;
     }
@@ -75,7 +66,7 @@ const Protected: React.FC = () => {
     try {
       const response = await axios.post(
         "http://10.2.2.63:5000/post",
-        { message: sanitizedPostText, hashtags: hashtags },
+        { message: postText, hashtags: hashtags },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -96,12 +87,6 @@ const Protected: React.FC = () => {
 
   const addHashtag = () => {
     const trimmed = hashtagInput.trim();
-
-    const isValidHashtag = /^[^\\]*$/.test(trimmed);
-    if (!isValidHashtag) {
-      setErrorMessage("Hashtag contains invalid characters. All characters are allowed except the backslash.");
-      return;
-    }
 
     if (trimmed.length > HASHTAG_CHAR_LIMIT) {
       setErrorMessage(`Hashtag exceeds the character limit of ${HASHTAG_CHAR_LIMIT}.`);
@@ -161,9 +146,13 @@ const Protected: React.FC = () => {
       <div className="post-feed" style={{ width: "100%" }}>
         {posts.map((post) => (
           <div key={post.id} className="post">
-            <h3>{post.username}:</h3>
-            <p>{post.message}</p>
-            <p className="hashtags">{post.hashtags.join(" ")}</p>
+            <h3 className="post-username">{post.username}:</h3>
+            <div className="post-text-box">
+              <p>{post.message}</p>
+            </div>
+            <div className="hashtag-box">
+              <p className="hashtags">{post.hashtags.join(" ")}</p>
+            </div>
           </div>
         ))}
       </div>

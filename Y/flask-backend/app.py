@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import re
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -11,14 +10,26 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# Ensure the "database" folder exists
+database_folder = os.path.join(os.getcwd(), "database")
+os.makedirs(database_folder, exist_ok=True)
+
 # Configure the database and JWT
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Using SQLite for simplicity
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(database_folder, 'users.db')}"  # Save users.db in the database folder
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'supersecretkey'  # Change this to a strong secret for production
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
+
+# Path for social_data.json
+social_data_path = os.path.join(database_folder, "social_data.json")
+
+# Ensure social_data.json exists
+if not os.path.exists(social_data_path):
+    with open(social_data_path, "w") as f:
+        json.dump({"users": []}, f, indent=4)
 
 # Define a User model
 class User(db.Model):
@@ -30,27 +41,6 @@ class User(db.Model):
 # Create the database if it doesn't exist
 with app.app_context():
     db.create_all()
-
-# Function to remove invalid posts
-def remove_invalid_posts():
-    json_filename = "social_data.json"
-    if not os.path.exists(json_filename):
-        return
-
-    with open(json_filename, "r") as f:
-        try:
-            social_data = json.load(f)
-        except json.JSONDecodeError:
-            return
-
-    for user in social_data.get("users", []):
-        if "posts" in user and user["posts"]:
-            latest_post = user["posts"][0]  # Get the newest post
-            if re.search(r'\\', latest_post["message"]):  # Check if message contains backslash
-                user["posts"].pop(0)  # Remove the latest post
-                
-    with open(json_filename, "w") as f:
-        json.dump(social_data, f, indent=4)
 
 # Registration endpoint
 @app.route('/register', methods=['POST'])
@@ -64,9 +54,8 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    json_filename = "social_data.json"
-    if os.path.exists(json_filename):
-        with open(json_filename, "r") as f:
+    if os.path.exists(social_data_path):
+        with open(social_data_path, "r") as f:
             try:
                 social_data = json.load(f)
             except json.JSONDecodeError:
@@ -83,7 +72,7 @@ def register():
     }
     social_data["users"].append(new_user_data)
 
-    with open(json_filename, "w") as f:
+    with open(social_data_path, "w") as f:
         json.dump(social_data, f, indent=4)
 
     return jsonify({"message": "User created successfully"}), 201
@@ -114,9 +103,8 @@ def create_post():
     hashtags = data.get('hashtags', [])
     username = get_jwt_identity()
 
-    json_filename = "social_data.json"
-    if os.path.exists(json_filename):
-        with open(json_filename, "r") as f:
+    if os.path.exists(social_data_path):
+        with open(social_data_path, "r") as f:
             try:
                 social_data = json.load(f)
             except json.JSONDecodeError:
@@ -125,14 +113,8 @@ def create_post():
         return jsonify({"message": "Social data file not found"}), 500
 
     user_found = False
-    notification_message = None  # Initialize notification message
-
     for user in social_data.get("users", []):
         if user.get("username") == username:
-            # Check for backslash or other unwanted characters in the message
-            if '\\' in message or any(ord(c) < 32 or ord(c) > 126 for c in message):  # Example check for control characters
-                notification_message = "Your post was removed due to the presence of invalid characters."
-                continue  # Skip adding this post
             post = {
                 "id": int(time.time() * 1000),
                 "message": message,
@@ -143,30 +125,19 @@ def create_post():
             user_found = True
             break
 
-    if notification_message:
-        # Add notification to the user's notifications list
-        user["notifications"] = user.get("notifications", [])
-        user["notifications"].append({
-            "message": notification_message,
-            "timestamp": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        })
-
     if not user_found:
         return jsonify({"message": "User not found in social data"}), 404
 
-    with open(json_filename, "w") as f:
+    with open(social_data_path, "w") as f:
         json.dump(social_data, f, indent=4)
 
-    remove_invalid_posts()  # Check and remove invalid posts
     return jsonify({"message": "Post created successfully"}), 201
-
 
 # Get posts endpoint
 @app.route('/posts', methods=['GET'])
 def get_posts():
-    json_filename = "social_data.json"
-    if os.path.exists(json_filename):
-        with open(json_filename, "r") as f:
+    if os.path.exists(social_data_path):
+        with open(social_data_path, "r") as f:
             try:
                 social_data = json.load(f)
             except json.JSONDecodeError:

@@ -100,50 +100,40 @@ User-specific data (posts, followers, etc.) is stored in a JSON file:
 - Upon registration, an entry is also added to the JSON file for tracking posts and followers.
 - After logging in, users are redirected to the main menu.
 
-### 2️⃣ Login & Register Page Design
-Before updating the main menu, the login and register pages were redesigned to enhance user experience. The **Register** page includes a stylish input form with a logo, borders, and a dark theme:
+### 2️⃣ UI Structure Update
+- The main menu structure was improved by splitting components:
+  - **Sidebar.tsx**: Handles the left sidebar for navigation.
+  - **AdditionalContent.tsx**: Displays additional information on the right.
+  - **MainLayout.tsx**: Manages layout structure and dynamically switches the main content between the post feed and user profile.
+- This makes the project more modular, allowing future additions such as notifications.
 
-#### 📜 Register.tsx (Snippet)
-```tsx
-const handleRegister = async () => {
-  try {
-    await axios.post("http://10.2.2.63:5000/register", {
-      username,
-      email,
-      password,
-    });
-    navigate("/login");
-  } catch (error) {
-    console.error("Registration failed", error);
-    alert("Registration failed. Please try again.");
-  }
-};
-```
+### 3️⃣ Security Improvement: Banning Backslashes
+- A user attempted to bypass filtering by posting cursed characters.
+- JSON stored these characters as Unicode sequences (e.g., `\U05235\`).
+- To prevent this, **users are unable to post messages containing a backslash (`\`)**.
 
-#### 🎨 Register.css (Snippet)
-```css
-.register-container {
-    background: rgba(0, 0, 0, 0.6);
-    border: 3px solid white;
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-    width: 350px;
-}
-```
-
-### 3️⃣ Posting a Message
+### 4️⃣ Posting a Message
 - Users enter text and hashtags into the input fields.
 - When posting, the data is stored in the JSON file under the corresponding user.
 - The post appears in the main feed and is visible to all users on the network.
 
-### 4️⃣ Main Menu Design
-- 📌 A **sidebar** on the left contains the logo and buttons for navigation.
-- 📰 The **main content area** includes the post input field and a feed displaying posts with usernames.
-- 📎 On the **right side**, an additional content section is available.
-
 ### 5️⃣ Profile Functionality
 When users click the profile button, they are directed to their own profile page, where they can see all the posts they have made. This is achieved by retrieving the username and accessing the JSON file to display every post associated with that username.
+
+### 6️⃣ User Testing Experience with Jakub
+- A significant user testing experience occurred with a user named **Jakub**, who tried to challenge the website's security by posting various cursed characters. 
+- This interaction became a playful battle of wits as Jakub sought to exploit vulnerabilities, while I worked diligently to fortify the system against such attempts. 
+- Through this process, I discovered various edge cases and improved the validation mechanisms in place, enhancing the overall robustness of the application. 
+- Jakub’s relentless creativity in testing the boundaries of the platform provided invaluable insights into user behavior and system vulnerabilities, ultimately leading to a more secure and user-friendly experience.
+
+### 7️⃣ Improved Website Structure
+- The previous structure had redundant components in multiple scripts.
+- The website was reorganized to improve readability and maintainability:
+  - **Protected.tsx** now only manages dynamic content.
+  - **MainLayout.tsx** centralizes layout handling.
+  - Additional components such as **Sidebar.tsx** and **AdditionalContent.tsx** handle specific UI elements.
+- Clicking "Home" or "Profile" now dynamically swaps content in the main section.
+- This modular approach allows for easier expansion, such as adding a Notifications section later.
 
 ## 🌐 Dual Server Architecture
 The application runs on two separate servers: one for the frontend and one for the backend. This approach offers several benefits:

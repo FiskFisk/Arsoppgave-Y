@@ -75,7 +75,7 @@
   max-width: none; /* ✅ Remove width limit */
   word-wrap: break-word;
   overflow-wrap: break-word;
-  background-color: #444;
+  border: 2px solid #444;
 }
 
 .hashtags {
@@ -95,4 +95,31 @@
 
 .char-count.red {
   color: red; /* Red color for character count when limit is exceeded */
+}
+
+.post-text-box {
+  max-height: 100px; /* Adjust height as needed */
+  overflow: hidden;
+  position: relative;
+  padding: 10px;
+  border: 1px solid transparent; /* Invisible box */
+}
+
+.hashtag-box {
+  max-height: 50px; /* Adjust height as needed */
+  overflow: hidden;
+  position: relative;
+  padding: 5px;
+  border: 1px solid transparent; /* Invisible box */
+}
+
+.post-text-box p,
+.hashtag-box p {
+  margin: 0;
+  word-wrap: break-word;
+  white-space: pre-wrap; /* Ensures long words wrap properly */
+}
+
+.post-username{
+  margin-bottom: 10px;
 }
