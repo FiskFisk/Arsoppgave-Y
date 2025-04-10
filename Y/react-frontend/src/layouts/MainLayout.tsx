@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Routes, Route } from "react-router-dom";
-import Sidebar from "./components/Sidebar.tsx";
-import AdditionalContent from "./components/AdditionalContent.tsx";
-import Protected from "../pages/Protected.tsx";
-import Profile from "../pages/Profile.tsx";
-import Notfic from "../pages/Notfic.tsx"; // Import Notfic
+import Sidebar from "./components/Sidebar";
+import AdditionalContent from "./components/AdditionalContent";
+import Protected from "../pages/Protected";
+import Profile from "../pages/Profile";
+import Notfic from "../pages/Notfic"; // Import Notfic
+import Tables from "../pages/AdminStatisticTable"; // Import Tables
+import AdminInfo from "../pages/AdminInfo"; // Import Admin Info
+import { useRole } from "../hooks/useRole"; // Make sure to import useRole
 import "./styles/MainLayout.css";
 
 const MainLayout: React.FC = () => {
@@ -13,12 +16,14 @@ const MainLayout: React.FC = () => {
   const [startX, setStartX] = useState(0);
   const [startWidth, setStartWidth] = useState(600);
 
+  const role = useRole(); // Get the user role
+
   // Start resizing when clicking the divider
   const startResizing = useCallback((event: React.MouseEvent) => {
     if (event.target instanceof HTMLElement && event.target.classList.contains("divider")) {
       setIsResizing(true);
-      setStartX(event.clientX); // Store initial X position
-      setStartWidth(contentWidth); // Store initial width
+      setStartX(event.clientX);
+      setStartWidth(contentWidth);
       document.body.style.cursor = "ew-resize"; // Change cursor globally
     }
   }, [contentWidth]);
@@ -56,13 +61,19 @@ const MainLayout: React.FC = () => {
 
   return (
     <div className="container">
-      <Sidebar />
+      <Sidebar role={role} /> {/* Pass the role to Sidebar */}
 
       <div className="content-area" style={{ width: `${contentWidth}px` }}>
         <Routes>
           <Route path="/protected" element={<Protected />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/notfic" element={<Notfic />} /> {/* Add Notfic route */}
+          <Route path="/notfic" element={<Notfic />} />
+          {role === "Admin" && (  // Conditional rendering for Admin routes
+            <>
+              <Route path="/tables" element={<Tables />} /> {/* Admin route */}
+              <Route path="/admininfo" element={<AdminInfo />} /> {/* Admin route */}
+            </>
+          )}
         </Routes>
       </div>
 

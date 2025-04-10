@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons'; // Import trash can icon
 import "./styles/Protected.css";
 
 interface Post {
@@ -16,31 +17,42 @@ const Protected: React.FC = () => {
   const [hashtagInput, setHashtagInput] = useState<string>("");
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [username, setUsername] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const POST_CHAR_LIMIT = 200;
+  const POST_CHAR_LIMIT = 500;
   const HASHTAG_CHAR_LIMIT = 30;
   const MAX_HASHTAGS = 5;
 
+  // Fetch username and role when the component mounts
   useEffect(() => {
-    const fetchUsername = async () => {
+    const fetchUsernameAndRole = async () => {
       try {
         const response = await axios.get("http://10.2.2.63:5000/protected", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
-        setUsername(response.data.message.split(", ")[1]);
+        const parts = response.data.message.split(", ");
+        setUsername(parts[1]); // Assuming parts[1] is the username
+
+        // Extract and clean the role
+        const fetchedRole = parts[2].replace("Role: ", "").trim(); // Remove "Role: " prefix
+        setRole(fetchedRole); // Set the cleaned role
+        console.log("Username fetched:", parts[1]); // Debugging log for username
+        console.log("Role fetched:", fetchedRole); // Debugging log for role
       } catch (error) {
-        console.error("Error fetching username:", error);
+        console.error("Error fetching username/role:", error);
       }
     };
 
-    fetchUsername();
+    fetchUsernameAndRole();
   }, []);
 
+  // Fetch all posts
   const fetchAllPosts = async () => {
     try {
       const response = await axios.get("http://10.2.2.63:5000/posts");
       setPosts(response.data.posts);
+      console.log("Fetched posts:", response.data.posts); // Debugging log for posts
     } catch (error) {
       console.error("Error fetching posts:", error);
     }
@@ -50,6 +62,7 @@ const Protected: React.FC = () => {
     fetchAllPosts();
   }, []);
 
+  // Handle post creation
   const handlePost = async () => {
     if (!postText.trim()) {
       setErrorMessage("Post cannot be empty!");
@@ -85,6 +98,7 @@ const Protected: React.FC = () => {
     }
   };
 
+  // Add hashtags
   const addHashtag = () => {
     const trimmed = hashtagInput.trim();
 
@@ -94,15 +108,34 @@ const Protected: React.FC = () => {
     }
 
     if (trimmed.length > 0 && hashtags.length < MAX_HASHTAGS) {
-      setHashtags(prev => [...prev, trimmed.startsWith("#") ? trimmed : `#${trimmed}`]);
+      setHashtags((prev) => [...prev, trimmed.startsWith("#") ? trimmed : `#${trimmed}`]);
       setHashtagInput("");
       setErrorMessage("");
+    }
+  };
+
+  // Handle post deletion
+  const handleDeletePost = async (postId: number) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.delete(`http://10.2.2.63:5000/posts/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.status === 200) {
+        fetchAllPosts(); // Refresh posts after deletion
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      setErrorMessage("Failed to delete post.");
     }
   };
 
   return (
     <div className="content">
       <h1>Hello, {username}!</h1>
+      {role && <p className="role-display">Your role: <strong>{role}</strong></p>}
 
       <div className="post-input-area">
         <textarea
@@ -120,7 +153,7 @@ const Protected: React.FC = () => {
           value={hashtagInput}
           onChange={(e) => setHashtagInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === " ") {
+            if (e.key === " " || e.key === "Enter") {
               e.preventDefault();
               addHashtag();
             }
@@ -146,6 +179,15 @@ const Protected: React.FC = () => {
       <div className="post-feed" style={{ width: "100%" }}>
         {posts.map((post) => (
           <div key={post.id} className="post">
+            {(role === "Admin" || role === "Moderator") && (  // Show delete button for Admin and Moderator roles
+              <button
+                onClick={() => handleDeletePost(post.id)}
+                className="delete-x-button"
+                title="Delete Post"
+              >
+                <FontAwesomeIcon icon={faTrash} /> {/* Trash can icon */}
+              </button>
+            )}
             <h3 className="post-username">{post.username}:</h3>
             <div className="post-text-box">
               <p>{post.message}</p>

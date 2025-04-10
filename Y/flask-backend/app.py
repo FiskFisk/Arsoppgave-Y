@@ -11,43 +11,42 @@ from config import db_config
 app = Flask(__name__)
 CORS(app)
 
-# Define the database folder for social_data.json
+# Define the database folder and social_data.json path
 database_folder = os.path.join(os.getcwd(), "database")
 os.makedirs(database_folder, exist_ok=True)
+social_data_path = os.path.join(database_folder, "social_data.json")
 
-# Configure SQLAlchemy to use the configuration from config.py
+# Configure the database using config.py
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+mysqlconnector://{db_config['user']}:{db_config['password']}@{db_config['host']}/{db_config['database']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'SuperDuperSecretKey' # Session encryption key 
+app.secret_key = 'SuperDuperSecretKey'
 
-# Initialize SQLAlchemy
+# Initialize extensions
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
-
-# Path for social_data.json
-social_data_path = os.path.join(database_folder, "social_data.json")
 
 # Ensure social_data.json exists
 if not os.path.exists(social_data_path):
     with open(social_data_path, "w") as f:
         json.dump({"users": []}, f, indent=4)
 
-# Define a User model for MariaDB
+# Define User model for SQLAlchemy
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
-# Create the database tables if they don't exist
+# Create DB tables
 with app.app_context():
     db.create_all()
 
-# Registration endpoint
+# Register a new user
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
+
     if User.query.filter_by(username=data['username']).first():
         return jsonify({"message": "Username already exists"}), 400
 
@@ -56,7 +55,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    # Load social data from JSON file
+    # Load existing social data
     if os.path.exists(social_data_path):
         with open(social_data_path, "r") as f:
             try:
@@ -66,17 +65,19 @@ def register():
     else:
         social_data = {"users": []}
 
-    # Append new user data
+    # Add new user to social data with default role
     new_user_data = {
         "id": new_user.id,
         "username": new_user.username,
+        "role": "User",  # Default role
+        "user-made": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
         "posts": [],
         "following": [],
         "followers": []
     }
     social_data["users"].append(new_user_data)
 
-    # Save updated social data back to the JSON file
+    # Save social data
     with open(social_data_path, "w") as f:
         json.dump(social_data, f, indent=4)
 
@@ -92,14 +93,29 @@ def login():
         return jsonify(access_token=access_token), 200
     return jsonify({"message": "Invalid username or password"}), 401
 
-# Protected endpoint
+# Protected test route
 @app.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
     current_user = get_jwt_identity()
-    return jsonify(message=f"You have logged in, {current_user}"), 200
+    
+    # Fetch user role from social_data.json
+    if os.path.exists(social_data_path):
+        with open(social_data_path, "r") as f:
+            try:
+                social_data = json.load(f)
+            except json.JSONDecodeError:
+                return jsonify({"message": "Error reading social data"}), 500
+    else:
+        return jsonify({"message": "Social data file not found"}), 500
 
-# Create Post endpoint
+    user_info = next((user for user in social_data["users"] if user["username"] == current_user), None)
+    if user_info:
+        role = user_info.get("role", "User")
+        return jsonify(message=f"You have logged in, {current_user}, Role: {role}"), 200
+    return jsonify({"message": "User not found"}), 404
+
+# Create a new post
 @app.route('/post', methods=['POST'])
 @jwt_required()
 def create_post():
@@ -108,7 +124,6 @@ def create_post():
     hashtags = data.get('hashtags', [])
     username = get_jwt_identity()
 
-    # Load social data from JSON file
     if os.path.exists(social_data_path):
         with open(social_data_path, "r") as f:
             try:
@@ -134,13 +149,12 @@ def create_post():
     if not user_found:
         return jsonify({"message": "User not found in social data"}), 404
 
-    # Save updated social data back to the JSON file
     with open(social_data_path, "w") as f:
         json.dump(social_data, f, indent=4)
 
     return jsonify({"message": "Post created successfully"}), 201
 
-# Get posts endpoint
+# Get latest posts
 @app.route('/posts', methods=['GET'])
 def get_posts():
     if os.path.exists(social_data_path):
@@ -163,6 +177,50 @@ def get_posts():
     posts_to_return = all_posts[:30]
 
     return jsonify({"posts": posts_to_return}), 200
+
+# Delete a post endpoint
+@app.route('/posts/<int:post_id>', methods=['DELETE'])
+@jwt_required()
+def delete_post(post_id):
+    current_user = get_jwt_identity()
+
+    if os.path.exists(social_data_path):
+        with open(social_data_path, "r") as f:
+            try:
+                social_data = json.load(f)
+            except json.JSONDecodeError:
+                return jsonify({"message": "Error reading social data"}), 500
+    else:
+        return jsonify({"message": "Social data file not found"}), 500
+
+    # Check if the current user is an admin
+    user_info = next((user for user in social_data["users"] if user["username"] == current_user), None)
+    if not user_info:
+        return jsonify({"message": "User not found"}), 404
+
+    # Allow admins to delete any post
+    if user_info.get("role") == "Admin":
+        # Find and delete the post from all users
+        for user in social_data.get("users", []):
+            user["posts"] = [post for post in user.get("posts", []) if post["id"] != post_id]
+
+    else:
+        # Regular users can only delete their own posts
+        user_found = False
+        for user in social_data.get("users", []):
+            if user.get("username") == current_user:
+                user["posts"] = [post for post in user.get("posts", []) if post["id"] != post_id]
+                user_found = True
+                break
+
+        if not user_found:
+            return jsonify({"message": "User not found in social data"}), 404
+
+    # Save the updated social data
+    with open(social_data_path, "w") as f:
+        json.dump(social_data, f, indent=4)
+
+    return jsonify({"message": "Post deleted successfully"}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

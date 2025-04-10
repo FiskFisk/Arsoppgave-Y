@@ -1,4 +1,3 @@
-
 .container {
   display: flex;
   height: 100vh;
@@ -61,7 +60,6 @@
   margin-top: 5px;
 }
 
-
 /* Post Feed */
 .post-feed {
   margin-top: 20px;
@@ -72,11 +70,29 @@
   margin: 10px 0;
   border-radius: 10px;
   width: 95%;
-  max-width: none; /* ✅ Remove width limit */
+  max-width: none; /* Remove width limit */
   word-wrap: break-word;
   overflow-wrap: break-word;
   border: 2px solid #444;
+  position: relative; /* Add position relative to contain the absolutely positioned button */
 }
+
+.delete-x-button {
+  border: none;
+  background-color: transparent; /* Remove background */
+  color: rgb(94, 94, 94); /* Text color */
+  cursor: pointer;
+  position: absolute; /* Positioning */
+  bottom: 10px; 
+  right: 10px;
+  width: 30px; 
+  height: 30px; 
+  display: flex; 
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  z-index: 10; /* Add a higher z-index */
+}
+
 
 .hashtags {
   display: flex;
@@ -98,7 +114,7 @@
 }
 
 .post-text-box {
-  max-height: 100px; /* Adjust height as needed */
+  max-height: 100%; /* Adjust height as needed */
   overflow: hidden;
   position: relative;
   padding: 10px;
@@ -120,6 +136,11 @@
   white-space: pre-wrap; /* Ensures long words wrap properly */
 }
 
-.post-username{
+.post-username {
   margin-bottom: 10px;
+}
+
+.error-message {
+  color: red; /* Color for error messages */
+  font-weight: bold;
 }
