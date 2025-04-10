@@ -9,3 +9,5 @@ __pycache__/
 # Ignore database and social data files
 users.db
 social_data.json
+#ignore databasen informasjon, slik at ingen kan access den uten tilgang til serveren 
+/config.py

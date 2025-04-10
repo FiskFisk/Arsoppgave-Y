@@ -6,19 +6,21 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
+from config import db_config
 
 app = Flask(__name__)
 CORS(app)
 
-# Ensure the "database" folder exists
+# Define the database folder for social_data.json
 database_folder = os.path.join(os.getcwd(), "database")
 os.makedirs(database_folder, exist_ok=True)
 
-# Configure the database and JWT
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(database_folder, 'users.db')}"  # Save users.db in the database folder
+# Configure SQLAlchemy to use the configuration from config.py
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+mysqlconnector://{db_config['user']}:{db_config['password']}@{db_config['host']}/{db_config['database']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'supersecretkey'  # Change this to a strong secret for production
+app.secret_key = 'SuperDuperSecretKey' # Session encryption key 
 
+# Initialize SQLAlchemy
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -31,14 +33,14 @@ if not os.path.exists(social_data_path):
     with open(social_data_path, "w") as f:
         json.dump({"users": []}, f, indent=4)
 
-# Define a User model
+# Define a User model for MariaDB
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
-# Create the database if it doesn't exist
+# Create the database tables if they don't exist
 with app.app_context():
     db.create_all()
 
@@ -54,6 +56,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
+    # Load social data from JSON file
     if os.path.exists(social_data_path):
         with open(social_data_path, "r") as f:
             try:
@@ -63,6 +66,7 @@ def register():
     else:
         social_data = {"users": []}
 
+    # Append new user data
     new_user_data = {
         "id": new_user.id,
         "username": new_user.username,
@@ -72,6 +76,7 @@ def register():
     }
     social_data["users"].append(new_user_data)
 
+    # Save updated social data back to the JSON file
     with open(social_data_path, "w") as f:
         json.dump(social_data, f, indent=4)
 
@@ -103,6 +108,7 @@ def create_post():
     hashtags = data.get('hashtags', [])
     username = get_jwt_identity()
 
+    # Load social data from JSON file
     if os.path.exists(social_data_path):
         with open(social_data_path, "r") as f:
             try:
@@ -128,6 +134,7 @@ def create_post():
     if not user_found:
         return jsonify({"message": "User not found in social data"}), 404
 
+    # Save updated social data back to the JSON file
     with open(social_data_path, "w") as f:
         json.dump(social_data, f, indent=4)
 
