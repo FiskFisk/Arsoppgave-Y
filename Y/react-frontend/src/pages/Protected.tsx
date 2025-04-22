@@ -134,8 +134,8 @@ const Protected: React.FC = () => {
 
   return (
     <div className="content">
-      <h1>Hello, {username}!</h1>
-      {role && <p className="role-display">Your role: <strong>{role}</strong></p>}
+      <h1>{username ? username : "Guest"}</h1>
+      {role && <p className="role-display"></p>}
 
       <div className="post-input-area">
         <textarea
