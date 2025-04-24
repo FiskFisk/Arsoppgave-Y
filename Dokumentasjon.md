@@ -86,7 +86,6 @@ User-specific data (posts, followers, etc.) is stored in a JSON file:
 - **Post and Follower Tracking**: Upon registration, the platform creates an entry for the user in the JSON file, which tracks posts, followers, and other interactions. This helps keep a record of user-generated content and ensures that users can always retrieve their data when needed. 
 - **Login Process**: After registering, users can log in by providing their credentials. Upon successful authentication, they are redirected to the main menu, where they can interact with the platform, view posts, follow others, and post their own content. This login mechanism ensures that the user's session is maintained securely throughout their use of the platform.
 
-### 2️⃣ UI Structure Update
 ### 2️⃣ **UI Structure Update**
 - **Component Modularity**: The main menu UI structure was reworked to enhance readability and maintainability by splitting it into distinct components. This approach improves the modularity of the app, allowing for easier updates and future expansions.
   - **Sidebar.tsx**: This component now handles the left sidebar of the app, which provides the user with quick navigation options such as home, profile, and settings. The sidebar is dynamic and can be easily extended to accommodate additional links or features.
@@ -139,7 +138,7 @@ User-specific data (posts, followers, etc.) is stored in a JSON file:
 ### 🔟 **Resizable Content Area**
 - **Customizable Layout**: The main content area of the application is now resizable, allowing users to adjust the width of the content display dynamically. This customization feature enables users to fine-tune their viewing experience based on personal preference.
 - **Implementation**: This functionality is implemented using mouse events (`mousedown`, `mousemove`, `mouseup`), allowing users to drag the edges of the content area to resize it. The resizing is confined within specific limits (e.g., between 200px and 1200px) to prevent the layout from breaking.
-  
+
 ## 🔄 Modular Design
 - The application is designed with modularity in mind:
    - **Components:** Reusable components like `Sidebar.tsx`, `AdditionalContent.tsx`, and `Protected.tsx` make the codebase easier to maintain and extend.
