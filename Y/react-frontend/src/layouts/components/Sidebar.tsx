@@ -15,13 +15,13 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
       <button onClick={() => navigate("/protected")}>Home</button>
       <button onClick={() => navigate("/notfic")}>Notifications</button>
       <button onClick={() => navigate("/profile")}>Profile</button>
+      <button onClick={() => navigate("/settings")}>Settings</button>
       {role === "Admin" && (  // Conditional rendering for Admin links
         <>
           <button onClick={() => navigate("/tables")}>Admin Statistic Table</button>
           <button onClick={() => navigate("/admininfo")}>Admin Info</button>
         </>
       )}
-      <button>Settings</button>
     </div>
   );
 };

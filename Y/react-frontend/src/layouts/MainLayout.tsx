@@ -6,6 +6,7 @@ import Protected from "../pages/Protected";
 import Profile from "../pages/Profile";
 import Notfic from "../pages/Notfic"; // Import Notfic
 import Tables from "../pages/AdminStatisticTable"; // Import Tables
+import Settings from "../pages/Settings"; // Import Settings
 import AdminInfo from "../pages/AdminInfo"; // Import Admin Info
 import { useRole } from "../hooks/useRole"; // Make sure to import useRole
 import "./styles/MainLayout.css";
@@ -68,6 +69,7 @@ const MainLayout: React.FC = () => {
           <Route path="/protected" element={<Protected />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/notfic" element={<Notfic />} />
+          <Route path="/settings" element={<Settings />} />
           {role === "Admin" && (  // Conditional rendering for Admin routes
             <>
               <Route path="/tables" element={<Tables />} /> {/* Admin route */}

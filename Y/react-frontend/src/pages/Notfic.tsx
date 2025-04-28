@@ -16,13 +16,13 @@ const Notfic: React.FC = () => {
     const fetchNotifications = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await axios.get("http://10.2.2.63:5000/protected", {
+        const response = await axios.get("/protected", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const username = response.data.message.split(", ")[1];
 
         // Fetch the user data to get notifications
-        const userResponse = await axios.get("http://10.2.2.63:5000/users");
+        const userResponse = await axios.get("/users");
         const user = userResponse.data.users.find((user: any) => user.username === username);
         setNotifications(user.notifications || []); // Set notifications if they exist
       } catch (error) {

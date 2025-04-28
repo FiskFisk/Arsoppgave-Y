@@ -18,13 +18,13 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchUsernameAndPosts = async () => {
       try {
-        const response = await axios.get("http://10.2.2.63:5000/protected", {
+        const response = await axios.get("/protected", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         const loggedInUsername = response.data.message.split(", ")[1];
         setUsername(loggedInUsername);
 
-        const postsResponse = await axios.get("http://10.2.2.63:5000/posts");
+        const postsResponse = await axios.get("/posts");
         const userPosts = postsResponse.data.posts.filter(
           (post: Post) => post.username === loggedInUsername
         );

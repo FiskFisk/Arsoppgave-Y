@@ -81,52 +81,52 @@ User-specific data (posts, followers, etc.) is stored in a JSON file:
 
 ## 🔄 Application Flow
 
-### 1️⃣ **User Registration & Login**
+### 1️🕐 **User Registration & Login**
 - **User Registration**: Users create an account on the platform by providing necessary details like a username, email address, and a password. The system validates these details, ensuring the username is unique and the email format is correct. After successful registration, the user data is stored in a MariaDB database running on a Raspberry Pi. This not only keeps user data secure but also enables efficient management and scaling of the platform. 
 - **Post and Follower Tracking**: Upon registration, the platform creates an entry for the user in the JSON file, which tracks posts, followers, and other interactions. This helps keep a record of user-generated content and ensures that users can always retrieve their data when needed. 
 - **Login Process**: After registering, users can log in by providing their credentials. Upon successful authentication, they are redirected to the main menu, where they can interact with the platform, view posts, follow others, and post their own content. This login mechanism ensures that the user's session is maintained securely throughout their use of the platform.
 
-### 2️⃣ **UI Structure Update**
+### 2🕑 **UI Structure Update**
 - **Component Modularity**: The main menu UI structure was reworked to enhance readability and maintainability by splitting it into distinct components. This approach improves the modularity of the app, allowing for easier updates and future expansions.
   - **Sidebar.tsx**: This component now handles the left sidebar of the app, which provides the user with quick navigation options such as home, profile, and settings. The sidebar is dynamic and can be easily extended to accommodate additional links or features.
   - **AdditionalContent.tsx**: Located on the right side of the interface, this component displays additional information, such as notifications, settings, or other contextual details. This allows the main feed to remain uncluttered while providing relevant information to users.
   - **MainLayout.tsx**: The core of the application, this component dynamically switches between different sections of the platform. For example, when a user selects the "Home" or "Profile" button, MainLayout.tsx loads the appropriate content, whether it’s the user’s post feed or their personal profile page. This modular layout design makes it easier to manage the flow of content across different screens.
 - This approach ensures a clean, organized structure, which not only makes the app easier to navigate but also ensures future features like notifications can be added seamlessly without cluttering the UI.
 
-### 3️⃣ **Security Improvement: Banning Backslashes**
+### 3️🕒 **Security Improvement: Banning Backslashes**
 - **User Input Vulnerability**: During testing, a user attempted to bypass the platform’s security measures by posting messages containing special characters, such as backslashes. These characters were encoded as Unicode sequences (e.g., `\U05235\`), potentially allowing malicious users to exploit the system.
 - **Security Measures**: To address this, we implemented a security enhancement that automatically filters out any messages containing backslashes (`\`). This change ensures that no potentially harmful characters are posted to the platform. 
 - **User Impact**: As a result, users are no longer able to post messages containing backslashes, which reduces the risk of exploits such as script injection or other harmful actions that could compromise the integrity of the platform. This proactive measure improves overall security and provides a safer environment for users.
 
-### 4️⃣ **Posting a Message**
+### 4🕓 **Posting a Message**
 - **Message Input and Submission**: Users can post messages on the platform by entering text and hashtags into a dedicated input field. The hashtags help categorize the posts and allow others to search for content related to specific topics. 
 - **Data Storage**: When users submit a post, the system stores the post data in the JSON file associated with that user. This includes the content of the post, the time of posting, and any hashtags included. This structure ensures that posts are properly attributed to the correct user.
 - **Visibility**: Once submitted, the post appears in the main feed, visible to all users of the platform. Posts are displayed chronologically, and users can interact with them by liking, commenting, or sharing. This feature encourages user engagement and fosters a dynamic social environment on the platform.
 
-### 5️⃣ **Profile Functionality**
+### 5️🕔 **Profile Functionality**
 - **User Profiles**: When users click on their profile button, they are redirected to their personal profile page. The profile page showcases all posts made by the user, along with basic user information such as their username, profile picture, and bio (if available).
 - **Data Retrieval**: To ensure that the profile page is always up-to-date, the application dynamically retrieves the user’s posts by querying the JSON file based on the user's username. This ensures that only relevant posts are shown, and users can quickly navigate through their content history.
 - **User Interaction**: The profile page allows users to edit their information, including changing their password or profile picture. Additionally, users can view their follower count, manage their follow list, and even see who is following them.
 
-### 6️⃣ **User Testing Experience with Jakub**
+### 6️🕕 **User Testing Experience with Jakub**
 - **Testing with Jakub**: One of the most insightful testing experiences came from a user named **Jakub**, who actively tried to exploit the platform by posting messages containing unusual or cursed characters. Jakub’s attempts to bypass input filters revealed several potential vulnerabilities within the platform’s security mechanisms. 
 - **Learning from the Test**: This engagement became an unexpected learning experience. Jakub’s creativity in attempting to exploit the platform pushed the system’s limitations, and I had to rapidly strengthen input validation and ensure that such attempts were properly blocked.
 - **System Improvements**: This process led to a series of improvements in input sanitization, enhancing the platform’s security. We fine-tuned the backend to handle special characters more effectively and added more comprehensive checks for invalid input, ensuring that the platform is robust against future testing attempts.
 - **Conclusion**: Jakub’s unconventional testing provided valuable insights into user behavior and helped improve the overall security of the application, ensuring a better experience for all users.
 
-### 7️⃣ **Improved Website Structure**
+### 7️🕖 **Improved Website Structure**
 - **Reorganization of Components**: Previously, the website’s code was scattered across multiple scripts, leading to redundancy and complexity in managing the app’s components. To improve the structure, the website was reorganized into a more modular design:
   - **Protected.tsx** now focuses solely on managing dynamic content, such as displaying posts or handling user-specific data. It no longer deals with layout management, which was handled elsewhere in the application.
   - **MainLayout.tsx** acts as the central component that handles the overall layout structure. It dynamically switches between sections, such as the home feed or the user profile, ensuring a seamless experience for users as they navigate through the platform.
   - **Sidebar.tsx** and **AdditionalContent.tsx** were split into separate components, each responsible for a specific part of the UI. This modular approach not only makes the code more readable but also allows for easier updates and future expansions, like the integration of notifications or admin settings.
 - **Dynamic Content Switching**: Clicking on the “Home” or “Profile” buttons now triggers dynamic content switching, making the platform more interactive. This flexibility allows the app to respond to user actions in real-time without unnecessary page reloads.
 
-### 8️⃣ **Raspberry Pi + MariaDB Migration**
+### 8️🕗 **Raspberry Pi + MariaDB Migration**
 - **Database Migration**: The database backend was migrated from local SQLite/MySQL to **MariaDB**, hosted on a **Raspberry Pi**. The Pi provides a lightweight and cost-effective solution for hosting the platform’s relational database while ensuring high availability and scalability.
 - **Setup and Configuration**: The Flask app was reconfigured to connect to MariaDB running on the Raspberry Pi. This was achieved by modifying the `db_config` in `config.py` to use the appropriate credentials and host settings. 
 - **Benefits**: By moving the database to a dedicated server (Raspberry Pi), the application offloads database management from the local machine, which is especially beneficial when handling large volumes of social data. Additionally, this setup ensures better performance and scalability as the platform grows, allowing for more users and posts to be handled efficiently.
 
-### 9️⃣ **Role-Based Access Control**
+### 9️🕘 **Role-Based Access Control**
 - **Role Definitions**: The platform supports three key user roles, each with different levels of access and functionality:
   - **User**: The basic role allows users to create posts, view the public feed, and manage their profile. Users can follow others and interact with posts but have no administrative privileges.
   - **Moderator**: In addition to all the permissions granted to Users, Moderators can delete posts made by other users. This helps maintain a clean and respectful environment on the platform, as Moderators can remove inappropriate or harmful content.
@@ -135,9 +135,13 @@ User-specific data (posts, followers, etc.) is stored in a JSON file:
     - **Admin Info**: Provides detailed system information, including logs, user activity data, and other settings necessary for platform management.
 - **Role-Based UI**: The UI adapts based on the user’s role, displaying only the relevant options and features for each user type. This ensures that the platform remains easy to navigate while maintaining appropriate access levels.
 
-### 🔟 **Resizable Content Area**
+### 10🕙 **Resizable Content Area**
 - **Customizable Layout**: The main content area of the application is now resizable, allowing users to adjust the width of the content display dynamically. This customization feature enables users to fine-tune their viewing experience based on personal preference.
 - **Implementation**: This functionality is implemented using mouse events (`mousedown`, `mousemove`, `mouseup`), allowing users to drag the edges of the content area to resize it. The resizing is confined within specific limits (e.g., between 200px and 1200px) to prevent the layout from breaking.
+
+### 11🕚 **some random stuff**
+- Added a way so when you are not loggin on the website you get a box that will have a regsiter or loggin button that you can go to that parts of the website, it will also have a "X" button if you want to just scroll witout beeing logged inn, but the box will also come op if you try to post or if you click the profile button.
+- Added a way to like other peoples comments, now in the json file uner every post will say likes, inside that it will show every user that have liked and that will be tranfared to a nummer and the nummer will be showen in the post
 
 ## 🔄 Modular Design
 - The application is designed with modularity in mind:

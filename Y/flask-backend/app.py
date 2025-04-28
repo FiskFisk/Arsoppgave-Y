@@ -83,6 +83,7 @@ def register():
 
     return jsonify({"message": "User created successfully"}), 201
 
+
 # Login endpoint
 @app.route('/login', methods=['POST'])
 def login():
@@ -114,6 +115,46 @@ def protected():
         role = user_info.get("role", "User")
         return jsonify(message=f"You have logged in, {current_user}, Role: {role}"), 200
     return jsonify({"message": "User not found"}), 404
+
+# Delete Account
+@app.route('/delete-account', methods=['DELETE'])
+@jwt_required()
+def delete_account():
+    current_user = get_jwt_identity()
+
+    # Step 1: Delete user from SQL database
+    user = User.query.filter_by(username=current_user).first()
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+    else:
+        return jsonify({"message": "User not found in SQL database"}), 404
+
+    # Step 2: Update social_data.json
+    if os.path.exists(social_data_path):
+        with open(social_data_path, "r") as f:
+            try:
+                social_data = json.load(f)
+            except json.JSONDecodeError:
+                return jsonify({"message": "Error reading social data"}), 500
+    else:
+        return jsonify({"message": "Social data file not found"}), 500
+
+    user_found = False
+    for user in social_data["users"]:
+        if user["username"] == current_user:
+            user["username"] = "Deleted Account"
+            user_found = True
+            break
+
+    if not user_found:
+        return jsonify({"message": "User not found in social data"}), 404
+
+    with open(social_data_path, "w") as f:
+        json.dump(social_data, f, indent=4)
+
+    return jsonify({"message": "Account deleted and marked in social data"}), 200
+
 
 # Create a new post
 @app.route('/post', methods=['POST'])

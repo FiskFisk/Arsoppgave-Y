@@ -10,7 +10,7 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://10.2.2.63:5000/login", {
+      const response = await axios.post("/login", {
         username,
         password,
       });

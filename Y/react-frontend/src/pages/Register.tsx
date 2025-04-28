@@ -11,7 +11,7 @@ const Register: React.FC = () => {
 
   const handleRegister = async () => {
     try {
-      await axios.post("http://10.2.2.63:5000/register", {
+      await axios.post("/register", {
         username,
         email,
         password,
