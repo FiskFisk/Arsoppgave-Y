@@ -12,6 +12,24 @@ Y is a social‑media web application inspired by X (formerly Twitter). It lets 
 
 Under the hood, it’s built with a React/TypeScript frontend and a Flask/Python backend, with SQL for authentication and a JSON file for social data.
 
+## 👥 Target Audience
+
+This project is intended for intermediate to advanced developers with a working knowledge of web development. Users should be comfortable with:
+
+- Running and managing frontend frameworks (React + TypeScript)
+
+- Setting up and configuring Flask/Python backends
+
+- Using SQL databases (specifically MariaDB)
+
+- Navigating and editing JSON files for structured data
+
+- Working with JWT authentication, role-based access control, and RESTful APIs
+
+While this manual provides step-by-step setup and feature explanations, it assumes a baseline familiarity with full-stack development concepts, terminal commands, and project structuring.
+
+If you're looking to learn by building or contribute to a real-world clone of a social platform like X (Twitter), you're in the right place.
+
 ---
 
 # 🚀 Quick Start

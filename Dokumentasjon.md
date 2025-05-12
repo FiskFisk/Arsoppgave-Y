@@ -141,6 +141,7 @@ User-specific data (posts, followers, etc.) is stored in a JSON file:
 
 ### 11🕚 **some random stuff**
 - Added a way so when you are not loggin on the website you get a box that will have a regsiter or loggin button that you can go to that parts of the website, it will also have a "X" button if you want to just scroll witout beeing logged inn, but the box will also come op if you try to post or if you click the profile button.
+- You can now deilte your acount so it gets deilited from the sql database and the name of the deilited abount get changed to Deleted Account in the json file.
 - Added a way to like other peoples comments, now in the json file uner every post will say likes, inside that it will show every user that have liked and that will be tranfared to a nummer and the nummer will be showen in the post
 
 ## 🔄 Modular Design
