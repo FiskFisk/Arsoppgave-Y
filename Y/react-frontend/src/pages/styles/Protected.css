@@ -1,3 +1,5 @@
+/* Protected.css */
+
 .container {
   display: flex;
   height: 100vh;
@@ -6,43 +8,36 @@
 /* Post Input Area */
 .post-input-area {
   margin-bottom: 20px;
-  padding-left: 10px; /* Add left padding for gap */
+  padding-left: 10px;
+}
+
+.post-textarea,
+.hashtag-input {
+  width: 95%;
+  background-color: var(--textarea-bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--textarea-border-color);
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 .post-textarea {
-  width: 95%;
-  background-color: #444;
-  color: white;
-  border: 1px solid #555;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-  height: 100px; /* Height of the textarea */
+  height: 100px;
 }
 
-.hashtag-input {
-  width: 95%;
-  background-color: #444;
-  color: white;
-  border: 1px solid #555;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-
-/* Display max hashtags and current input together */
 .hashtag-limit {
   display: flex;
   justify-content: space-between;
   width: 95%;
-  color: gray; /* Color for the limit text */
+  color: var(--hashtag-limit-text);
   margin-bottom: 10px;
 }
 
 /* Post Button */
 .post-button {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--modal-button-bg);
+  color: var(--modal-button-text);
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
@@ -51,13 +46,14 @@
 }
 
 .post-button:hover {
-  background-color: #0056b3;
+  background-color: var(--modal-button-hover-bg);
 }
 
 /* Error Message */
 .error-message {
-  color: red; /* Red color for error messages */
+  color: var(--error-color);
   margin-top: 5px;
+  font-weight: bold;
 }
 
 /* Post Feed */
@@ -70,77 +66,107 @@
   margin: 10px 0;
   border-radius: 10px;
   width: 95%;
-  max-width: none; /* Remove width limit */
+  max-width: none;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  border: 2px solid #444;
-  position: relative; /* Add position relative to contain the absolutely positioned button */
+  border: 2px solid var(--textarea-bg-color);
+  position: relative;
 }
 
 .delete-x-button {
   border: none;
-  background-color: transparent; /* Remove background */
-  color: rgb(94, 94, 94); /* Text color */
+  background-color: transparent;
+  color: var(--delete-button-color);
   cursor: pointer;
-  position: absolute; /* Positioning */
-  bottom: 10px; 
+  position: absolute;
+  bottom: 10px;
   right: 10px;
-  width: 30px; 
-  height: 30px; 
-  display: flex; 
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  z-index: 10; /* Add a higher z-index */
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
-
 
 .hashtags {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
   font-weight: bold;
-  color: #007bff;
+  color: var(--hashtag-color);
   max-width: 600px;
   word-wrap: break-word;
 }
 
-/* Character Count Styling */
 .char-count {
-  color: rgb(255, 255, 255); /* Default color for character count */
+  color: var(--text-color);
 }
 
 .char-count.red {
-  color: red; /* Red color for character count when limit is exceeded */
+  color: var(--error-color);
 }
 
 .post-text-box {
-  max-height: 100%; /* Adjust height as needed */
+  max-height: 100%;
   overflow: hidden;
   position: relative;
   padding: 10px;
-  border: 1px solid transparent; /* Invisible box */
+  border: 1px solid transparent;
 }
 
 .hashtag-box {
-  max-height: 50px; /* Adjust height as needed */
+  max-height: 50px;
   overflow: hidden;
   position: relative;
   padding: 5px;
-  border: 1px solid transparent; /* Invisible box */
+  border: 1px solid transparent;
 }
 
 .post-text-box p,
 .hashtag-box p {
   margin: 0;
   word-wrap: break-word;
-  white-space: pre-wrap; /* Ensures long words wrap properly */
+  white-space: pre-wrap;
 }
 
 .post-username {
   margin-bottom: 10px;
 }
 
-.error-message {
-  color: red; /* Color for error messages */
+.hashtag-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.hashtag-tag {
+  background-color: var(--hashtag-color);
+  color: var(--text-color);
+  padding: 6px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.hashtag-remove {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  margin-left: 8px;
   font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.hashtag-remove:hover {
+  color: var(--hashtag-hover-color);
+}
+
+h3{
+  color: white
 }

@@ -3,6 +3,7 @@ import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import NotLoggedIn from "../pages/NotLoggedIn";
+import "./styles/root.css"; // Import the root.css
 import "./styles/Protected.css";
 
 interface Post {
@@ -157,6 +158,23 @@ const Protected: React.FC = () => {
             }
           }}
         />
+        <div className="hashtag-list">
+        {hashtags.map((tag, index) => (
+          <span className="hashtag-tag" key={index}>
+          {tag}
+            <button
+            className="hashtag-remove"
+            title="Remove hashtag"
+            onClick={() =>
+            setHashtags(prev => prev.filter((_, i) => i !== index))
+          }
+      >
+        ×
+      </button>
+    </span>
+  ))}
+</div>
+
         <div className="hashtag-limit">
           <span>{hashtags.length}/{MAX_HASHTAGS} hashtags</span>
           <span>{hashtagInput.length}/{HASHTAG_CHAR_LIMIT} chars</span>
@@ -168,7 +186,7 @@ const Protected: React.FC = () => {
       <div className="post-feed">
         {posts.map(post => (
           <div key={post.id} className="post">
-            {(role === "Admin" || role === "Moderator") && (
+            {(role === "Admin" || role === "Moderator" || post.username === username) && (
               <button
                 className="delete-x-button"
                 title="Delete Post"

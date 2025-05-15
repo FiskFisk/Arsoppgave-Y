@@ -1,5 +1,7 @@
+/* Login.css */
+
 body {
-    background-color: black;
+    background-color: var(--background-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,8 +10,8 @@ body {
 }
 
 .login-container {
-    background: rgba(0, 0, 0, 0.6); /* Slightly more transparent */
-    border: 3px solid white;
+    background: var(--container-bg);
+    border: 3px solid var(--input-border-color);
     padding: 30px;
     border-radius: 15px;
     text-align: center;
@@ -20,7 +22,7 @@ body {
     width: 120px;
     height: 120px;
     background-image: url("../../../public/Y-Logo.svg");
-    background-color: white;
+    background-color: var(--button-bg-color);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -28,7 +30,7 @@ body {
 }
 
 h2 {
-    color: white;
+    color: var(--text-color);
     font-size: 24px;
     margin-bottom: 20px;
 }
@@ -39,8 +41,8 @@ h2 {
     padding: 12px;
     margin-bottom: 15px;
     background: transparent;
-    border: 3px solid white;
-    color: white;
+    border: 3px solid var(--input-border-color);
+    color: var(--text-color);
     font-size: 16px;
     border-radius: 8px;
 }
@@ -52,8 +54,8 @@ input::placeholder {
 button {
     width: 100%;
     padding: 12px;
-    background: white;
-    color: black;
+    background: var(--button-bg-color);
+    color: var(--button-text-color);
     font-size: 18px;
     border: none;
     cursor: pointer;
@@ -62,18 +64,18 @@ button {
 }
 
 button:hover {
-    background: lightgray;
+    background: var(--button-hover-bg-color);
 }
 
 p {
-    color: white;
+    color: var(--text-color);
     font-size: 16px;
     margin-top: 15px;
 }
 
 span {
     cursor: pointer;
-    color: cyan;
+    color: var(--accent-color);
     font-weight: bold;
 }
 

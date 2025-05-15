@@ -1,0 +1,31 @@
+:root {
+    --background-color: black;
+    --text-color: white;
+    --accent-color: cyan;
+    --input-border-color: white;
+    --button-bg-color: white;
+    --button-text-color: black;
+    --button-hover-bg-color: lightgray;
+    --container-bg: rgba(0, 0, 0, 0.6);
+
+    --modal-bg-color: var(--button-bg-color);
+    --modal-text-color: var(--button-text-color);
+    --modal-shadow-color: rgba(0, 0, 0, 0.3);
+    --modal-button-bg: #007bff;
+    --modal-button-hover-bg: #0056b3;
+    --modal-button-text: var(--text-color);
+
+    --textarea-bg-color: #444;
+    --textarea-border-color: #555;
+    --hashtag-color: var(--modal-button-bg);
+    --error-color: red;
+    --hashtag-hover-color: #ffdada;
+    --hashtag-limit-text: gray;
+    --delete-button-color: rgb(94, 94, 94);
+
+    --primary-color: #007bff;
+    --primary-hover-color: #0056b3;
+    --danger-color: #dc3545;
+    --danger-hover-color: #a71d2a;
+    --button-bg-color: white;
+}

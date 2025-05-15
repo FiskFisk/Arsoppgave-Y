@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "./styles/root.css"; // Import the root.css
 import "./styles/Settings.css"; // Styling file
 
 const Settings: React.FC = () => {

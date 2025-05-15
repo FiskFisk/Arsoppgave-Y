@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/AdditionalContent.css";
+import "../styles/MainLayout.css";
 
 const AdditionalContent: React.FC = () => {
   return (

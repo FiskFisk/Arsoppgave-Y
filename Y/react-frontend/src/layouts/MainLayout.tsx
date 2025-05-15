@@ -4,11 +4,11 @@ import Sidebar from "./components/Sidebar";
 import AdditionalContent from "./components/AdditionalContent";
 import Protected from "../pages/Protected";
 import Profile from "../pages/Profile";
-import Notfic from "../pages/Notfic"; // Import Notfic
-import Tables from "../pages/AdminStatisticTable"; // Import Tables
-import Settings from "../pages/Settings"; // Import Settings
-import AdminInfo from "../pages/AdminInfo"; // Import Admin Info
-import { useRole } from "../hooks/useRole"; // Make sure to import useRole
+import Notfic from "../pages/Notfic";
+import Tables from "../pages/AdminStatisticTable";
+import Settings from "../pages/Settings";
+import AdminInfo from "../pages/AdminInfo";
+import { useRole } from "../hooks/useRole";
 import "./styles/MainLayout.css";
 
 const MainLayout: React.FC = () => {
@@ -16,39 +16,38 @@ const MainLayout: React.FC = () => {
   const [isResizing, setIsResizing] = useState(false);
   const [startX, setStartX] = useState(0);
   const [startWidth, setStartWidth] = useState(600);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const role = useRole(); // Get the user role
+  const role = useRole();
 
-  // Start resizing when clicking the divider
+  // Handle resizing for content area (desktop only)
   const startResizing = useCallback((event: React.MouseEvent) => {
-    if (event.target instanceof HTMLElement && event.target.classList.contains("divider")) {
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.classList.contains("divider")
+    ) {
       setIsResizing(true);
       setStartX(event.clientX);
       setStartWidth(contentWidth);
-      document.body.style.cursor = "ew-resize"; // Change cursor globally
+      document.body.style.cursor = "ew-resize";
     }
   }, [contentWidth]);
 
-  // Handle resizing
   const resize = useCallback((event: MouseEvent) => {
-    if (!isResizing) return;
+  if (!isResizing) return;
+  const deltaX = event.clientX - startX;
+  let newWidth = startWidth - deltaX; // Reverse the logic here
+  if (newWidth >= 200 && newWidth <= 1200) {
+    setContentWidth(newWidth);
+  }
+}, [isResizing, startX, startWidth]);
 
-    const deltaX = event.clientX - startX; // Get movement difference
-    let newWidth = startWidth + deltaX; // Apply difference to width
 
-    // Restrict width within the limits
-    if (newWidth >= 200 && newWidth <= 1200) {
-      setContentWidth(newWidth);
-    }
-  }, [isResizing, startX, startWidth]);
-
-  // Stop resizing
   const stopResizing = useCallback(() => {
     setIsResizing(false);
-    document.body.style.cursor = "default"; // Reset cursor
+    document.body.style.cursor = "default";
   }, []);
 
-  // Add event listeners when resizing starts
   useEffect(() => {
     if (isResizing) {
       document.addEventListener("mousemove", resize);
@@ -61,28 +60,40 @@ const MainLayout: React.FC = () => {
   }, [isResizing, resize, stopResizing]);
 
   return (
-    <div className="container">
-      <Sidebar role={role} /> {/* Pass the role to Sidebar */}
+    <div className={`container ${isSidebarOpen ? "sidebar-open" : ""}`}>
+      {/* Mobile Menu Toggle (only visible on small screens via CSS) */}
+      <button
+        className="mobile-menu-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
 
-      <div className="content-area" style={{ width: `${contentWidth}px` }}>
+      <div className={`sidebar-wrapper ${isSidebarOpen ? "open" : ""}`}>
+        <Sidebar role={role} />
+      </div>
+
+      <div className="content-area" style={{ width: `${contentWidth}px`, padding: "0 20px" }}>
         <Routes>
           <Route path="/protected" element={<Protected />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/notfic" element={<Notfic />} />
           <Route path="/settings" element={<Settings />} />
-          {role === "Admin" && (  // Conditional rendering for Admin routes
+          {role === "Admin" && (
             <>
-              <Route path="/tables" element={<Tables />} /> {/* Admin route */}
-              <Route path="/admininfo" element={<AdminInfo />} /> {/* Admin route */}
+              <Route path="/tables" element={<Tables />} />
+              <Route path="/admininfo" element={<AdminInfo />} />
             </>
           )}
         </Routes>
       </div>
 
-      {/* Divider - Click to Resize */}
+      {/* Divider for resizing (desktop only) */}
       <div className="divider" onMouseDown={startResizing} />
 
-      <AdditionalContent />
+      <div className="additional-content-wrapper">
+        <AdditionalContent />
+      </div>
     </div>
   );
 };

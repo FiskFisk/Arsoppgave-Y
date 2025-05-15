@@ -1,56 +1,208 @@
-/* Global */
-body,
-html {
+/* ================================
+   General Layout
+================================= */
+html, body {
   margin: 0;
   padding: 0;
-  width: 100%;
   height: 100%;
-  background-color: #000000; /* Dark background */
-  color: white;
-  overflow: hidden; /* Disable scrolling on the entire page */
+  overflow: hidden; /* Prevent full page scrolling */
 }
 
-/* Layout container */
 .container {
   display: flex;
+  width: 100%;
   height: 100vh;
-}
-
-/* Content area */
-.content-area {
-  flex: 1;
-  padding: 20px;
-  background-color: #0a0a0a;
-  height: 100vh;
-  overflow-y: auto;
-  width: 600px;
-  transition: width 0.1s ease-in-out;
-}
-
-/* Hide scrollbar */
-.content-area::-webkit-scrollbar {
-  display: none;
-}
-.content-area {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Divider (Resizable) */
-.divider {
-  width: 5px;
-  background-color: gray;
-  cursor: ew-resize;
-  height: 100%;
+  overflow: hidden;
   position: relative;
 }
 
-/* Only apply cursor change when actively dragging */
-.divider:active {
-  background-color: lightgray;
+.container.sidebar-open {
+  overflow: hidden;
 }
 
-/* Prevent text selection while dragging */
-* {
-  user-select: none;
+
+/* ================================
+   Sidebar Wrapper (For Mobile Toggle)
+================================= */
+.sidebar-wrapper {
+  transition: transform 0.3s ease-in-out;
 }
+
+@media (max-width: 768px) {
+  .sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background: black;
+    transform: translateX(-100%);
+    z-index: 999;
+  }
+
+  .sidebar-wrapper.open {
+    transform: translateX(0);
+  }
+}
+
+
+/* ================================
+   Sidebar Content
+================================= */
+.sidebar {
+  width: 200px;
+  background-color: #000000;
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1000;
+  border-right: 1px solid gray;
+}
+
+.logo {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.sidebar button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+  margin: 5px 0;
+  width: 100%;
+}
+
+.sidebar button:hover {
+  background-color: #444;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 250px;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    border-right: none;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    position: fixed;
+  }
+
+  .sidebar-wrapper.open .sidebar {
+    transform: translateX(0);
+  }
+}
+
+
+/* ================================
+   Mobile Menu Toggle Button
+================================= */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  background: #222;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  font-size: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: left 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block;
+    top: 10px;
+    left: 10px;
+    background: white;
+    color: black;
+    font-size: 24px;
+    padding: 10px;
+    width: 50px;
+    border-radius: 5px;
+    z-index: 1000;
+  }
+
+  .container.sidebar-open .mobile-menu-toggle {
+    left: 290px;
+  }
+}
+
+
+/* ================================
+   Content Area (Middle Section)
+================================= */
+.content-area {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0 20px;
+
+  /* Hide scrollbar but allow scroll */
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE 10+ */
+}
+
+.content-area::-webkit-scrollbar {
+  display: none;               /* Chrome, Safari, Opera */
+}
+
+@media (max-width: 768px) {
+  .content-area {
+    width: 100% !important;
+    padding-top: 60px;
+  }
+}
+
+
+/* ================================
+   Additional Content (Right Sidebar)
+================================= */
+.additional-content-wrapper {
+  width: 300px;
+  height: 100%;
+  overflow-y: auto;
+  transition: width 0.2s ease;
+}
+
+.additional-content {
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  background-color: #000000;
+  border-left: 1px solid gray;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .additional-content-wrapper {
+    display: none;
+  }
+}
+
+
+/* ================================
+   Optional: Hidden Divider Code
+================================= */
+/*
+.divider {
+  width: 5px;
+  background-color: #ccc;
+  cursor: ew-resize;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  height: 100vh;
+  display: block;
+  z-index: 1001;
+  transform: translateX(-10px);
+}
+*/

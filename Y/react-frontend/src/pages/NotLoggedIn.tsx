@@ -1,6 +1,7 @@
 // src/components/NotLoggedIn.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import "./styles/root.css"; // Import the root.css
 import './styles/NotLoggedIn.css';
 
 const NotLoggedIn: React.FC<{ onClose: () => void }> = ({ onClose }) => {

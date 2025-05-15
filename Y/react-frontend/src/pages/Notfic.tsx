@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./styles/root.css"; // Import the root.css
 import "./styles/Notfic.css"; // Import the CSS file
 
 interface Notification {
